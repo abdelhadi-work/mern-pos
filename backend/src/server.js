@@ -1,45 +1,32 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import { connectDB } from './config/db.js';  // Import the connectDB function
+import express from 'express';  // Import express using ESM syntax
+import dotenv from 'dotenv';  // Import dotenv for environment variables
+import cors from 'cors';  // Import cors to handle cross-origin requests
+import connectDB from './config/db.js';  // Import MongoDB connection
+import authRoutes from './routes/authRoutes.js';  // Import auth routes
+import { notFound, errorHandler } from './middleware/errorMiddleware.js';  // Import error handling middleware
 
-dotenv.config();  // Load environment variables from .env
+// Load environment variables from .env file
+dotenv.config();
 
+// Initialize Express app
 const app = express();
 
+// Middleware
+app.use(cors());  // Enable CORS for all routes
+app.use(express.json());  // Parse incoming JSON requests
+
 // Connect to MongoDB
-connectDB(); // Call the function to connect to MongoDB
+connectDB();
 
-// Middleware to parse incoming JSON requests
-app.use(express.json());
+// Routes
+app.use('/api/auth', authRoutes);  // Authentication routes
 
-// Basic route for testing the server
-app.get('/', (req, res) => {
-  console.log('GET request received at /');
-  res.send('Backend is working!');
-});
-
-// Test POST route to check if server works
-app.post('/test', (req, res) => {
-  const { message } = req.body;
-  console.log('POST request received with message:', message);
-  res.json({ response: `Received: ${message}` });
-});
-
-// Set the port (can be dynamic via environment variables)
-const PORT = process.env.PORT || 5001;
+// Error handling middleware for 404 and other errors
+app.use(notFound);  // Handle 404 errors
+app.use(errorHandler);  // Handle other errors
 
 // Start the server
+const PORT = process.env.PORT || 5001;  // Use port from env or default to 5001
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
-// Handle uncaught exceptions and unhandled rejections
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
-  process.exit(1); // Exit the process to avoid any further issues
-});
-
-process.on('unhandledRejection', (err) => {
-  console.error('Unhandled Rejection:', err);
-  process.exit(1); // Exit the process to avoid any further issues
+  console.log(`Server running on port ${PORT}`);
 });
