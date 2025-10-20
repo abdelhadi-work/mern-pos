@@ -1,5 +1,5 @@
 // ============================================
-// FILE: client/src/pages/ManageUsers.jsx (NEW)
+// FILE: client/src/pages/ManageUsers.jsx (FIXED)
 // ============================================
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, AlertTriangle } from 'lucide-react';
@@ -58,15 +58,21 @@ const ManageUsers = () => {
 
     try {
       if (editingUser) {
-        await authAPI.updateUser(editingUser._id, formData);
+        const response = await authAPI.updateUser(editingUser._id, formData);
+        console.log('Update response:', response.data);
       } else {
-        await authAPI.register(formData);
+        const response = await authAPI.register(formData);
+        console.log('Register response:', response.data);
       }
       
-      fetchUsers();
+      // Wait a bit then fetch users to ensure DB has updated
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await fetchUsers();
+      
       setShowModal(false);
       resetForm();
     } catch (err) {
+      console.error('Error saving user:', err);
       setError(err.response?.data?.message || 'Operation failed');
     } finally {
       setLoading(false);
@@ -77,7 +83,7 @@ const ManageUsers = () => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
         await authAPI.deleteUser(userId);
-        fetchUsers();
+        await fetchUsers();
       } catch (err) {
         alert(err.response?.data?.message || 'Delete failed');
       }
@@ -160,16 +166,6 @@ const ManageUsers = () => {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         title={editingUser ? 'Edit User' : 'Add New User'}
-        footer={
-          <>
-            <button className="btn-secondary" onClick={() => setShowModal(false)}>
-              Cancel
-            </button>
-            <button className="btn-primary" onClick={handleSubmit} disabled={loading}>
-              {loading ? 'Saving...' : (editingUser ? 'Update User' : 'Create User')}
-            </button>
-          </>
-        }
       >
         {error && <div className="error-message">{error}</div>}
 
@@ -244,6 +240,15 @@ const ManageUsers = () => {
               <option value="finance_admin">Finance Admin</option>
               <option value="main_admin">Main Admin</option>
             </select>
+          </div>
+
+          <div className="modal-footer">
+            <button type="button" className="btn-secondary" onClick={() => setShowModal(false)}>
+              Cancel
+            </button>
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? 'Saving...' : (editingUser ? 'Update User' : 'Create User')}
+            </button>
           </div>
         </form>
       </Modal>
