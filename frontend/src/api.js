@@ -1,5 +1,5 @@
 // ============================================
-// FILE: client/src/api.js
+// FILE: client/src/api.js (SIMPLIFIED)
 // ============================================
 import axios from 'axios';
 
@@ -7,7 +7,6 @@ const api = axios.create({
   baseURL: 'http://localhost:5001/api',
 });
 
-// Add token to requests automatically
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -25,12 +24,31 @@ export const authAPI = {
   deleteUser: (id) => api.delete(`/auth/users/${id}`),
 };
 
+// Category endpoints
+export const categoryAPI = {
+  getAll: (params) => api.get('/categories', { params }),
+  getById: (id) => api.get(`/categories/${id}`),
+  create: (formData) => api.post('/categories', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  update: (id, formData) => api.put(`/categories/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  delete: (id) => api.delete(`/categories/${id}`),
+};
+
 // Product endpoints
 export const productAPI = {
-  getAll: () => api.get('/products'),
-  create: (data) => api.post('/products', data),
-  update: (id, data) => api.put(`/products/${id}`, data),
+  getAll: (params) => api.get('/products', { params }),
+  getById: (id) => api.get(`/products/${id}`),
+  create: (formData) => api.post('/products', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  update: (id, formData) => api.put(`/products/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
   delete: (id) => api.delete(`/products/${id}`),
+  getLowStock: () => api.get('/products/lowstock'),
 };
 
 // Order endpoints
