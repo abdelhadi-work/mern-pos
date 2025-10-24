@@ -1,5 +1,5 @@
 // ============================================
-// FILE: client/src/api.js
+// FILE: client/src/api.js (COMPLETE)
 // ============================================
 import axios from 'axios';
 
@@ -7,7 +7,6 @@ const api = axios.create({
   baseURL: 'http://localhost:5001/api',
 });
 
-// Add token to requests automatically
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -25,19 +24,42 @@ export const authAPI = {
   deleteUser: (id) => api.delete(`/auth/users/${id}`),
 };
 
-// Product endpoints
-export const productAPI = {
-  getAll: () => api.get('/products'),
-  create: (data) => api.post('/products', data),
-  update: (id, data) => api.put(`/products/${id}`, data),
-  delete: (id) => api.delete(`/products/${id}`),
+// Category endpoints
+export const categoryAPI = {
+  getAll: (params) => api.get('/categories', { params }),
+  getById: (id) => api.get(`/categories/${id}`),
+  create: (formData) => api.post('/categories', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  update: (id, formData) => api.put(`/categories/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  delete: (id) => api.delete(`/categories/${id}`),
 };
 
-// Order endpoints
+// Product endpoints
+export const productAPI = {
+  getAll: (params) => api.get('/products', { params }),
+  getById: (id) => api.get(`/products/${id}`),
+  create: (formData) => api.post('/products', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  update: (id, formData) => api.put(`/products/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  delete: (id) => api.delete(`/products/${id}`),
+  getLowStock: () => api.get('/products/lowstock'),
+};
+
+// Order endpoints - ENHANCED VERSION
 export const orderAPI = {
-  getAll: () => api.get('/orders'),
+  getAll: (params) => api.get('/orders', { params }),  // Enhanced with params
   create: (data) => api.post('/orders', data),
   getById: (id) => api.get(`/orders/${id}`),
+  getTodaySales: () => api.get('/orders/today'),  // NEW ENDPOINT
+  cancelOrder: (id, data) => api.put(`/orders/${id}/cancel`, data),  // NEW ENDPOINT
+  refundOrder: (id, data) => api.post(`/orders/${id}/refund`, data),  // NEW ENDPOINT
+  getSalesReport: (params) => api.get('/orders/report', { params }),  // NEW ENDPOINT
 };
 
 // Report endpoints

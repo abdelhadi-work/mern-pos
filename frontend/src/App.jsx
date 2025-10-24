@@ -1,5 +1,5 @@
 // ============================================
-// FILE: client/src/App.jsx (FIXED - Keeps current page on refresh)
+// FILE: client/src/App.jsx (FIXED ROUTES)
 // ============================================
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import POS from "./pages/POS";
 import Reports from "./pages/Reports";
 import Products from "./pages/Products";
+import Categories from "./pages/Categories";
 import Orders from "./pages/Orders";
 import ManageUsers from "./pages/ManageUsers";
 import Navbar from "./components/Navbar";
@@ -18,7 +19,7 @@ import Sidebar from "./components/Sidebar";
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, loading } = useAuth();
 
-  // Show nothing while checking authentication
+  // Show loading spinner
   if (loading) {
     return (
       <div
@@ -110,7 +111,7 @@ const RootRedirect = () => {
     return <Navigate to="/login" replace />;
   }
 
-  // Redirect based on role only from root path
+  // Redirect based on role
   if (user?.role === "cashier") {
     return <Navigate to="/pos" replace />;
   }
@@ -119,7 +120,7 @@ const RootRedirect = () => {
 };
 
 function App() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <BrowserRouter>
@@ -130,10 +131,10 @@ function App() {
           element={isAuthenticated ? <RootRedirect /> : <Login />}
         />
 
-        {/* Root - Only redirect from here */}
+        {/* Root */}
         <Route path="/" element={<RootRedirect />} />
 
-        {/* Protected Routes - Stay on current page on refresh */}
+        {/* Protected Routes */}
         <Route
           path="/dashboard"
           element={
@@ -153,6 +154,18 @@ function App() {
             <ProtectedRoute allowedRoles={["main_admin"]}>
               <DashboardLayout>
                 <ManageUsers />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* FIXED: Categories - Only main_admin can access */}
+        <Route
+          path="/categories"
+          element={
+            <ProtectedRoute allowedRoles={["main_admin"]}>
+              <DashboardLayout>
+                <Categories />
               </DashboardLayout>
             </ProtectedRoute>
           }

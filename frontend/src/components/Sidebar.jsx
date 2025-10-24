@@ -10,13 +10,15 @@ import {
   FileText, 
   DollarSign, 
   Users, 
-  Settings 
+  Settings,
+  Layers
 } from 'lucide-react';
 
 const menuConfig = {
   main_admin: [
     { name: 'Dashboard', icon: BarChart3, path: '/dashboard' },
     { name: 'Manage Users', icon: Users, path: '/users' },
+    { name: 'Categories', icon: Layers, path: '/categories' },
     { name: 'Products', icon: Package, path: '/products' },
     { name: 'Orders', icon: FileText, path: '/orders' },
     { name: 'Reports', icon: BarChart3, path: '/reports' },
@@ -36,7 +38,7 @@ const menuConfig = {
   ],
   cashier: [
     { name: 'POS', icon: ShoppingCart, path: '/pos' },
-    { name: 'Products', icon: Package, path: '/products' },  // <-- ADD THIS LINE
+    { name: 'Products', icon: Package, path: '/products' },
     { name: 'Settings', icon: Settings, path: '/settings' },
   ],
 };
