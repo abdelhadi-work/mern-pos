@@ -1,45 +1,57 @@
+// ============================================
+// FILE: server/src/index.js (COMPLETE)
+// ============================================
 import express from 'express';
 import dotenv from 'dotenv';
-import { connectDB } from './config/db.js';  // Import the connectDB function
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import connectDB from './config/db.js';
+import authRoutes from './routes/authRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
+import productRoutes from './routes/productRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';  // ADD THIS LINE
+import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
-dotenv.config();  // Load environment variables from .env
+// Load environment variables
+dotenv.config();
 
+// Get directory name for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Initialize Express app
 const app = express();
 
-// Connect to MongoDB
-connectDB(); // Call the function to connect to MongoDB
-
-// Middleware to parse incoming JSON requests
+// Middleware
+app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Basic route for testing the server
+// Serve static files (uploaded images)
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Connect to MongoDB
+connectDB();
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);  // ADD THIS LINE
+
+// Health check route
 app.get('/', (req, res) => {
-  console.log('GET request received at /');
-  res.send('Backend is working!');
+  res.json({ message: 'Electronics POS API is running' });
 });
 
-// Test POST route to check if server works
-app.post('/test', (req, res) => {
-  const { message } = req.body;
-  console.log('POST request received with message:', message);
-  res.json({ response: `Received: ${message}` });
-});
-
-// Set the port (can be dynamic via environment variables)
-const PORT = process.env.PORT || 5001;
+// Error handling middleware
+app.use(notFound);
+app.use(errorHandler);
 
 // Start the server
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
-// Handle uncaught exceptions and unhandled rejections
-process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
-  process.exit(1); // Exit the process to avoid any further issues
-});
-
-process.on('unhandledRejection', (err) => {
-  console.error('Unhandled Rejection:', err);
-  process.exit(1); // Exit the process to avoid any further issues
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Uploads directory: ${path.join(__dirname, '../uploads')}`);
 });
