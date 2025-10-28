@@ -1,5 +1,5 @@
 // ============================================
-// FILE: server/src/models/Order.js
+// FILE: server/src/models/Order.js (FIXED)
 // ============================================
 import mongoose from 'mongoose';
 
@@ -170,20 +170,20 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
-// Generate unique order number before saving
+// ============================================
+// FIXED: Generate unique order number before saving
+// ============================================
 orderSchema.pre('save', async function(next) {
   if (!this.orderNumber) {
     // Generate order number: YYYYMMDD-XXXX
     const date = new Date();
     const dateStr = date.toISOString().slice(0, 10).replace(/-/g, '');
     
-    // Find the last order of the day
-    const startOfDay = new Date(date.setHours(0, 0, 0, 0));
-    const endOfDay = new Date(date.setHours(23, 59, 59, 999));
-    
+    // Find the last order with today's date prefix
+    // This searches for orderNumber starting with today's date
     const lastOrder = await this.constructor.findOne({
-      createdAt: { $gte: startOfDay, $lte: endOfDay }
-    }).sort({ createdAt: -1 });
+      orderNumber: new RegExp(`^${dateStr}-`)
+    }).sort({ orderNumber: -1 });
     
     let sequence = 1;
     if (lastOrder && lastOrder.orderNumber) {
