@@ -1,4 +1,4 @@
-// ============================================
+
 // FILE: client/src/api.js (COMPLETE)
 // ============================================
 import axios from 'axios';
@@ -68,4 +68,16 @@ export const reportAPI = {
   getFinancial: (params) => api.get('/reports/financial', { params }),
 };
 
+
+// Customer API (public)
+export const customerAPI = {
+  create: (data) => api.post('/customers', data),
+  placeOrder: (data) => api.post('/customers/order', data),
+};
+
+
 export default api;
+
+
+export const getProducts = (params) => api.get("/products", { params });
+export const createOrder = (data) => api.post("/orders", data);

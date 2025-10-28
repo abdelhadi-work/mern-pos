@@ -12,6 +12,8 @@ import categoryRoutes from './routes/categoryRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';  // ADD THIS LINE
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
+import publicRoutes from './routes/publicRoutes.js';
+import customerRoutes from './routes/customerRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -38,7 +40,10 @@ connectDB();
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/customers', customerRoutes);
+
 app.use('/api/orders', orderRoutes);  // ADD THIS LINE
+app.use('/api/public', publicRoutes);
 
 // Health check route
 app.get('/', (req, res) => {

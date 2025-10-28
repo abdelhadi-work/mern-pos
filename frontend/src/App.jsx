@@ -14,12 +14,12 @@ import Orders from "./pages/Orders";
 import ManageUsers from "./pages/ManageUsers";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
+import Shop from "./pages/Shop";
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, loading } = useAuth();
 
-  // Show loading spinner
   if (loading) {
     return (
       <div
@@ -55,7 +55,6 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   }
 
   if (allowedRoles && !allowedRoles.includes(user?.role)) {
-    // Redirect to appropriate default page based on role
     const defaultPages = {
       cashier: "/pos",
       main_admin: "/dashboard",
@@ -89,33 +88,22 @@ const DashboardLayout = ({ children }) => {
 };
 
 // Placeholder Page
-const PlaceholderPage = ({ page }) => {
-  return (
-    <div className="placeholder-container">
-      <div className="placeholder-icon">⚙️</div>
-      <h2 className="placeholder-title">{page.replace("_", " ")}</h2>
-      <p className="placeholder-text">
-        This section is under development. Feature will be available soon.
-      </p>
-    </div>
-  );
-};
+const PlaceholderPage = ({ page }) => (
+  <div className="placeholder-container">
+    <div className="placeholder-icon">⚙️</div>
+    <h2 className="placeholder-title">{page.replace("_", " ")}</h2>
+    <p className="placeholder-text">
+      This section is under development. Feature will be available soon.
+    </p>
+  </div>
+);
 
 // Root Redirect Component
 const RootRedirect = () => {
   const { user, isAuthenticated, loading } = useAuth();
-
   if (loading) return null;
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  // Redirect based on role
-  if (user?.role === "cashier") {
-    return <Navigate to="/pos" replace />;
-  }
-
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (user?.role === "cashier") return <Navigate to="/pos" replace />;
   return <Navigate to="/dashboard" replace />;
 };
 
@@ -125,11 +113,12 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Route */}
+        {/* Public Routes */}
         <Route
           path="/login"
           element={isAuthenticated ? <RootRedirect /> : <Login />}
         />
+        <Route path="/shop" element={<Shop />} />
 
         {/* Root */}
         <Route path="/" element={<RootRedirect />} />
@@ -159,7 +148,6 @@ function App() {
           }
         />
 
-        {/* FIXED: Categories - Only main_admin can access */}
         <Route
           path="/categories"
           element={
