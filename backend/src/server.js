@@ -12,6 +12,7 @@ import categoryRoutes from './routes/categoryRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';  // ADD THIS LINE
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
+import analyticsRoutes from './routes/analyticsRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -39,6 +40,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);  // ADD THIS LINE
+app.use('/api/analytics', analyticsRoutes);
 
 // Health check route
 app.get('/', (req, res) => {

@@ -68,4 +68,15 @@ export const reportAPI = {
   getFinancial: (params) => api.get('/reports/financial', { params }),
 };
 
+// Analytics endpoints (Finance Dashboard)
+export const analyticsAPI = {
+  getSummary: (params) => api.get('/analytics/summary', { params }),
+  getTimeseries: (params) => api.get('/analytics/timeseries', { params }),
+  getPaymentMix: (params) => api.get('/analytics/payment-mix', { params }),
+  getOrders: (params) => api.get('/analytics/orders', { params }),
+  getProfitSummary: (params) => api.get('/analytics/profit/summary', { params }),
+  getCategoryProfit: (params) => api.get('/analytics/profit/categories', { params }),
+  getProductProfit: (params) => api.get('/analytics/profit/products', { params }),
+};
+
 export default api;

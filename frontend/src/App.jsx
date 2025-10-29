@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import POS from "./pages/POS";
 import Reports from "./pages/Reports";
+import FinanceDashboard from "./pages/FinanceDashboard";
 import Products from "./pages/Products";
 import Categories from "./pages/Categories";
 import Orders from "./pages/Orders";
@@ -222,7 +223,7 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["finance_admin"]}>
               <DashboardLayout>
-                <PlaceholderPage page="finance" />
+                <FinanceDashboard />
               </DashboardLayout>
             </ProtectedRoute>
           }
