@@ -173,9 +173,9 @@ function App() {
         />
 
         <Route
-          path="/pos"
+          path="/pos "
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["cashier"]}>
               <DashboardLayout>
                 <POS />
               </DashboardLayout>
