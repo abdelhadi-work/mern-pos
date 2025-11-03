@@ -1,19 +1,59 @@
-
-// FILE: client/src/api.js (COMPLETE)
+// ============================================
+// FILE: client/src/api.js (WITH DEBUGGING)
 // ============================================
 import axios from 'axios';
 
+const API_BASE_URL = 'http://localhost:5001/api';
+
 const api = axios.create({
-  baseURL: 'http://localhost:5001/api',
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+// Request Interceptor - Add token and log requests
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    console.log(`📤 API Request: ${config.method.toUpperCase()} ${config.url}`);
+    return config;
+  },
+  (error) => {
+    console.error('❌ Request Error:', error);
+    return Promise.reject(error);
   }
-  return config;
-});
+);
+
+// Response Interceptor - Log responses and handle errors
+api.interceptors.response.use(
+  (response) => {
+    console.log(`✅ API Response: ${response.config.method.toUpperCase()} ${response.config.url}`, response.data);
+    return response;
+  },
+  (error) => {
+    console.error('❌ API Error:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message,
+      data: error.response?.data
+    });
+
+    // Handle 401 - Unauthorized
+    if (error.response?.status === 401) {
+      console.log('🔒 Unauthorized - Redirecting to login');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 // Auth endpoints
 export const authAPI = {
@@ -51,33 +91,28 @@ export const productAPI = {
   getLowStock: () => api.get('/products/lowstock'),
 };
 
-// Order endpoints - ENHANCED VERSION
+// Order endpoints
 export const orderAPI = {
-  getAll: (params) => api.get('/orders', { params }),  // Enhanced with params
+  getAll: (params) => api.get('/orders', { params }),
   create: (data) => api.post('/orders', data),
   getById: (id) => api.get(`/orders/${id}`),
-  getTodaySales: () => api.get('/orders/today'),  // NEW ENDPOINT
-  cancelOrder: (id, data) => api.put(`/orders/${id}/cancel`, data),  // NEW ENDPOINT
-  refundOrder: (id, data) => api.post(`/orders/${id}/refund`, data),  // NEW ENDPOINT
-  getSalesReport: (params) => api.get('/orders/report', { params }),  // NEW ENDPOINT
+  getTodaySales: () => api.get('/orders/today'),
+  cancelOrder: (id, data) => api.put(`/orders/${id}/cancel`, data),
+  refundOrder: (id, data) => api.post(`/orders/${id}/refund`, data),
+  getSalesReport: (params) => api.get('/orders/report', { params }),
 };
 
-// Report endpoints
-export const reportAPI = {
-  getSales: (params) => api.get('/reports/sales', { params }),
-  getFinancial: (params) => api.get('/reports/financial', { params }),
+// Public endpoints (no auth required)
+export const publicAPI = {
+  getProducts: (params) => axios.get(`${API_BASE_URL}/public/products`, { params }),
+  getCategories: () => axios.get(`${API_BASE_URL}/public/categories`),
+  createOrder: (data) => axios.post(`${API_BASE_URL}/public/orders`, data),
 };
 
-
-// Customer API (public)
+// Customer endpoints
 export const customerAPI = {
   create: (data) => api.post('/customers', data),
   placeOrder: (data) => api.post('/customers/order', data),
 };
 
-
 export default api;
-
-
-export const getProducts = (params) => api.get("/products", { params });
-export const createOrder = (data) => api.post("/orders", data);

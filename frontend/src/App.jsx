@@ -15,6 +15,9 @@ import ManageUsers from "./pages/ManageUsers";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import Shop from "./pages/Shop";
+import Delivery from "./pages/Delivery"
+
+
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -60,6 +63,8 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
       main_admin: "/dashboard",
       finance_admin: "/dashboard",
       accounting_admin: "/dashboard",
+      delivery: "/delivery",
+
     };
     return <Navigate to={defaultPages[user?.role] || "/dashboard"} replace />;
   }
@@ -104,6 +109,8 @@ const RootRedirect = () => {
   if (loading) return null;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (user?.role === "cashier") return <Navigate to="/pos" replace />;
+  if (user?.role === "delivery") return <Navigate to="/delivery" replace />;
+
   return <Navigate to="/dashboard" replace />;
 };
 
@@ -159,10 +166,23 @@ function App() {
           }
         />
 
+
+        <Route
+  path="/delivery"
+  element={
+    <ProtectedRoute allowedRoles={["delivery"]}>
+      <DashboardLayout>
+        <Delivery />
+      </DashboardLayout>
+    </ProtectedRoute>
+  }
+/>
+
+
         <Route
           path="/pos"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["cashier"]}>
               <DashboardLayout>
                 <POS />
               </DashboardLayout>

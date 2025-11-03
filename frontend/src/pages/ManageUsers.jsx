@@ -242,6 +242,7 @@ const ManageUsers = () => {
               <option value="cashier">Cashier</option>
               <option value="accounting_admin">Accounting Admin</option>
               <option value="finance_admin">Finance Admin</option>
+              <option value="delivery">Delivery</option>
               <option value="main_admin">Main Admin</option>
             </select>
           </div>

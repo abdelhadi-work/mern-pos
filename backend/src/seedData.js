@@ -51,6 +51,16 @@ const seedUsers = async () => {
         role: 'cashier',
         isActive: true,
       },
+      {
+        username: 'delivery',
+        email: 'delivery@pos.com',
+        password: 'delivery123',
+        fullName: 'Delivery User',
+        phone: '+1234567899',
+        role: 'delivery',
+        isActive: true,
+      }
+
     ];
 
     // Insert users into the database
