@@ -1,0 +1,74 @@
+.delivery-page {
+  padding: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.orders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.order-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.order-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: bold;
+}
+
+.order-info p {
+  margin: 0.3rem 0;
+}
+
+.order-items {
+  margin-top: 0.8rem;
+  background: #f7f7f7;
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+.status-badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.status-pending { background: #f59e0b; }
+.status-out_for_delivery { background: #3b82f6; }
+.status-delivered { background: #16a34a; }
+
+.order-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.refresh-btn {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.refresh-btn:hover { background: #2563eb; }
+
+.delivered-label {
+  color: #16a34a;
+  font-weight: bold;
+}

@@ -1,5 +1,6 @@
 // ============================================
 // FILE: server/src/models/Order.js (FIXED)
+// FILE: server/src/models/Order.js (FIXED FOR GUEST ORDERS)
 // ============================================
 import mongoose from 'mongoose';
 
@@ -29,6 +30,20 @@ const orderItemSchema = new mongoose.Schema({
     min: 0
   }
 });
+
+// Guest customer schema (embedded, not referenced)
+const guestCustomerSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  phone: {
+    type: String,
+    required: true
+  },
+  email: String,
+  address: String
+}, { _id: false });
 
 const orderSchema = new mongoose.Schema(
   {
@@ -62,7 +77,7 @@ const orderSchema = new mongoose.Schema(
     tax: {
       rate: {
         type: Number,
-        default: 0 // 11% VAT for Lebanon
+        default: 0
       },
       amount: {
         type: Number,
@@ -78,7 +93,8 @@ const orderSchema = new mongoose.Schema(
     paymentMethod: {
       type: String,
       required: true,
-      enum: ['cash', 'card', 'split', 'transfer', 'credit']
+      enum: ['cash', 'card', 'split', 'transfer', 'credit', 'pending'],
+      default: 'pending'
     },
     paymentDetails: {
       amountReceived: {
@@ -90,7 +106,6 @@ const orderSchema = new mongoose.Schema(
         min: 0,
         default: 0
       },
-      // For split payments
       cash: {
         type: Number,
         min: 0,
@@ -101,10 +116,8 @@ const orderSchema = new mongoose.Schema(
         min: 0,
         default: 0
       },
-      // For card payments
       cardLastDigits: String,
       transactionId: String,
-      // For credit sales
       creditCustomer: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Customer'
@@ -119,22 +132,42 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: true,
       enum: ['pending', 'completed', 'cancelled', 'refunded', 'partial_refund'],
-      default: 'completed'
+      default: 'pending'
     },
+    // Make cashier optional for guest orders
     cashier: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true
+      required: false,
+      default: null
     },
+  //for delivery 
+  delivery: {
+  assignedTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // Delivery user reference
+    default: null,
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'out_for_delivery', 'delivered', 'refunded'],
+    default: 'pending',
+  },
+  deliveredAt: Date,
+},
+
+    // Support both referenced and embedded customer data
     customer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Customer'
+      ref: 'Customer',
+      required: false
     },
+    // For guest orders without customer account
+    guestCustomer: guestCustomerSchema,
     notes: {
       type: String,
       trim: true
     },
-    // For refunds
     refund: {
       amount: {
         type: Number,
@@ -148,7 +181,6 @@ const orderSchema = new mongoose.Schema(
         ref: 'User'
       }
     },
-    // Session tracking for daily reports
     session: {
       date: {
         type: Date,
@@ -156,13 +188,19 @@ const orderSchema = new mongoose.Schema(
       },
       shift: {
         type: String,
-        enum: ['morning', 'afternoon', 'evening', 'night'],
+        enum: ['morning', 'afternoon', 'evening', 'night', 'online'],
         default: 'morning'
       },
       register: {
         type: String,
-        default: 'POS-1'
+        default: 'ONLINE'
       }
+    },
+    // Flag to identify online orders
+    orderSource: {
+      type: String,
+      enum: ['pos', 'online'],
+      default: 'pos'
     }
   },
   {
@@ -175,12 +213,14 @@ const orderSchema = new mongoose.Schema(
 // ============================================
 orderSchema.pre('save', async function(next) {
   if (!this.orderNumber) {
-    // Generate order number: YYYYMMDD-XXXX
     const date = new Date();
     const dateStr = date.toISOString().slice(0, 10).replace(/-/g, '');
     
     // Find the last order with today's date prefix
     // This searches for orderNumber starting with today's date
+    const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+    
     const lastOrder = await this.constructor.findOne({
       orderNumber: new RegExp(`^${dateStr}-`)
     }).sort({ orderNumber: -1 });
@@ -196,20 +236,25 @@ orderSchema.pre('save', async function(next) {
   next();
 });
 
-// Virtual for profit calculation
-orderSchema.virtual('profit').get(function() {
-  // This would need cost data from products
-  // Placeholder for profit calculation
-  return this.total * 0.3; // Assuming 30% profit margin
+// Virtual for customer display
+orderSchema.virtual('customerDisplay').get(function() {
+  if (this.guestCustomer) {
+    return this.guestCustomer;
+  }
+  if (this.customer) {
+    return this.customer;
+  }
+  return { name: 'Walk-in Customer', phone: 'N/A' };
 });
 
-// Indexes for better query performance
+// Indexes
 orderSchema.index({ orderNumber: 1 });
 orderSchema.index({ status: 1 });
 orderSchema.index({ cashier: 1 });
 orderSchema.index({ createdAt: -1 });
 orderSchema.index({ 'session.date': -1 });
 orderSchema.index({ paymentMethod: 1 });
+orderSchema.index({ orderSource: 1 });
 
 orderSchema.set('toJSON', { virtuals: true });
 orderSchema.set('toObject', { virtuals: true });

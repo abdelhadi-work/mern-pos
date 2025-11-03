@@ -79,6 +79,7 @@ const Login = () => {
           <div className="demo-item">Admin: admin / admin123</div>
           <div className="demo-item">Finance: finance / finance123</div>
           <div className="demo-item">Cashier: cashier / cashier123</div>
+          <div className="demo-item">Delivery: delivery / delivery123</div>
         </div>
       </div>
     </div>

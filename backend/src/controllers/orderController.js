@@ -3,6 +3,7 @@
 // ============================================
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
+import User from '../models/User.js';
 
 // CREATE NEW ORDER
 export const createOrder = async (req, res) => {
@@ -100,6 +101,49 @@ export const createOrder = async (req, res) => {
     });
   }
 };
+
+// ============================================
+// CREATE ONLINE ORDER (for public / website orders)
+// ===========================================
+export const createOnlineOrder = async (req, res) => {
+  try {
+    const orderData = req.body;
+
+    // 🔍 Find the delivery user automatically
+    const deliveryUser = await User.findOne({ role: 'delivery' });
+
+    // 💾 Create the online order
+    const newOrder = await Order.create({
+      ...orderData,
+      orderSource: 'online',                 // identify as online order
+      session: { shift: 'online' },          // default session for web
+      status: 'pending',                     // start as pending
+      delivery: {
+        assignedTo: deliveryUser ? deliveryUser._id : null,
+        status: 'pending'
+      }
+    });
+
+    // ✅ Populate response
+    const populatedOrder = await Order.findById(newOrder._id)
+      .populate('delivery.assignedTo', 'fullName username')
+      .populate('guestCustomer')
+      .populate('items.product', 'name sku');
+
+    res.status(201).json({
+      success: true,
+      message: 'Online order created successfully',
+      order: populatedOrder
+    });
+  } catch (error) {
+    console.error('❌ Error creating online order:', error);
+    res.status(400).json({
+      success: false,
+      message: error.message || 'Failed to create online order'
+    });
+  }
+};
+
 
 // GET ALL ORDERS
 export const getAllOrders = async (req, res) => {
@@ -537,6 +581,7 @@ function getShift() {
 
 export default {
   createOrder,
+  createOnlineOrder,
   getAllOrders,
   getOrderById,
   getTodaySales,
