@@ -13,10 +13,17 @@ const router = express.Router();
 // Public login route
 router.post("/login", login);
 
-// Main Admin only routes
+// Main Admin only routes for creating/modifying users
 router.post("/register", protect, authorize("main_admin"), registerUser);
-router.get("/users", protect, authorize("main_admin"), getAllUsers);
 router.put("/users/:id", protect, authorize("main_admin"), updateUser);
 router.delete("/users/:id", protect, authorize("main_admin"), deleteUser);
+
+// All admin roles can VIEW users (for dashboard stats)
+router.get(
+  "/users", 
+  protect, 
+  authorize("main_admin", "finance_admin", "accounting_admin"), 
+  getAllUsers
+);
 
 export default router;
