@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Truck, CheckCircle, Clock, Package, RefreshCw } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import api from "../api";
+import "../styles/delivery.css";
 
 const Delivery = () => {
   const { user } = useAuth();

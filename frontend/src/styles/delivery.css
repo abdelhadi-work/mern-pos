@@ -1,0 +1,204 @@
+/* ============= DELIVERY PAGE STYLE (With Animations) ============= */
+
+.delivery-page {
+  padding: 20px;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.page-header h2 {
+  font-size: 1.6rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.refresh-btn {
+  background-color: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.refresh-btn:hover {
+  background-color: #1e40af;
+}
+
+
+/* GRID */
+.orders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+
+/* CARD */
+.order-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  padding: 18px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+.order-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+}
+
+
+/* ========== STATUS BADGE ========== */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.status-pending {
+  background-color: #f59e0b;
+  animation: pulsePending 1.5s infinite ease-in-out;
+}
+
+.status-out_for_delivery {
+  background-color: #3b82f6;
+  animation: slideOut 0.4s ease forwards;
+}
+
+.status-delivered {
+  background-color: #10b981;
+  animation: deliveredPop 0.45s ease-out forwards;
+}
+
+
+/* ========== ANIMATIONS ========== */
+
+/* Pending Pulse */
+@keyframes pulsePending {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* Slide Animation when moving to out_for_delivery */
+@keyframes slideOut {
+  0% { transform: translateX(-6px); opacity: 0.8; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+/* Delivered Success Pop */
+@keyframes deliveredPop {
+  0% { transform: scale(1); box-shadow: 0 0 0 rgba(16,185,129,0.4); }
+  50% { transform: scale(1.06); box-shadow: 0 0 12px rgba(16,185,129,0.6); }
+  100% { transform: scale(1); box-shadow: 0 0 0 rgba(16,185,129,0); }
+}
+
+
+/* ========== DELIVERED STAMP ========== */
+.delivered-stamp {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-12deg);
+  background: rgba(16,185,129,0.18);
+  color: #065f46;
+  border: 2px solid rgba(16,185,129,0.4);
+  font-size: 1.4rem;
+  font-weight: 700;
+  padding: 8px 22px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: stampIn 0.6s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes stampIn {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6) rotate(-12deg); }
+  70% { opacity: 1; transform: translate(-50%, -50%) scale(1.1) rotate(-12deg); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(-12deg); }
+}
+
+
+/* ITEMS */
+.order-items {
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+}
+.order-items h4 {
+  margin-bottom: 6px;
+  font-size: 0.95rem;
+  color: #111;
+}
+.order-items li {
+  list-style: none;
+  padding: 3px 0;
+  font-size: 0.9rem;
+}
+
+
+/* ACTION BUTTONS */
+.order-actions {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-primary,
+.btn-secondary {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.3s ease, transform 0.1s ease;
+}
+
+.btn-primary {
+  background: #22c55e;
+  color: white;
+}
+.btn-primary:hover {
+  background: #16a34a;
+  transform: scale(1.03);
+}
+
+.btn-secondary {
+  background: #3b82f6;
+  color: white;
+}
+.btn-secondary:hover {
+  background: #1d4ed8;
+  transform: scale(1.03);
+}
+
+
+/* Responsive */
+@media (max-width: 600px) {
+  .orders-grid {
+    grid-template-columns: 1fr;
+  }
+}

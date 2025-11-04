@@ -37,6 +37,10 @@ router.put('/:id/status', protect, authorize('delivery'), async (req, res) => {
 
     if (status === 'delivered') {
       order.status = 'completed';
+       order.paymentDetails.isPaid = true; 
+       if (order.paymentMethod === 'pending') {
+    order.paymentMethod = 'cash';
+  }
       order.delivery.deliveredAt = new Date();
     } else if (status === 'refunded') {
       order.status = 'refunded';
