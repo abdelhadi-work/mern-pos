@@ -68,6 +68,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Download, Printer, RefreshCw, ChevronDown, ChevronRight } from "lucide-react";
 import { orderAPI, authAPI } from "../api";
 import "../styles/dashboard.css";
+import "../styles/reports.css";
 
 const fmtDate = (d) =>
   new Date(d).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
@@ -85,7 +86,7 @@ const addDays = (iso, days) => {
   return d.toISOString().slice(0, 10);
 };
 
-const QuickRanges = ({ onRange }) => {
+const QuickRanges = ({ onRange, dateFrom, dateTo }) => {
   const t = todayISO();
   const firstDayMonth = new Date();
   firstDayMonth.setDate(1);
@@ -98,15 +99,31 @@ const QuickRanges = ({ onRange }) => {
     return d.toISOString().slice(0, 10);
   })();
 
-  // return (
-  //   <div className="report-filters" style={{ gap: 8, flexWrap: "wrap" }}>
-  //     <button className="btn-primary" onClick={() => onRange(t, t)}>Today</button>
-  //     <button className="btn-secondary" onClick={() => onRange(weekStart, t)}>This Week</button>
-  //     <button className="btn-secondary" onClick={() => onRange(firstDayMonthISO, t)}>This Month</button>
-  //     <button className="btn-secondary" onClick={() => onRange(addDays(t, -6), t)}>Last 7 Days</button>
-  //     <button className="btn-secondary" onClick={() => onRange(addDays(t, -29), t)}>Last 30 Days</button>
-  //   </div>
-  // );
+  const presets = [
+    { label: "Today", from: t, to: t },
+    { label: "This Week", from: weekStart, to: t },
+    { label: "This Month", from: firstDayMonthISO, to: t },
+    { label: "Last 7 Days", from: addDays(t, -6), to: t },
+    { label: "Last 30 Days", from: addDays(t, -29), to: t },
+  ];
+
+  return (
+    <div className="quick-range-group">
+      {presets.map((preset) => {
+        const isActive = preset.from === dateFrom && preset.to === dateTo;
+        return (
+          <button
+            type="button"
+            key={preset.label}
+            className={`quick-range${isActive ? " is-active" : ""}`}
+            onClick={() => onRange(preset.from, preset.to)}
+          >
+            {preset.label}
+          </button>
+        );
+      })}
+    </div>
+  );
 };
 
 const Reports = () => {
@@ -174,6 +191,12 @@ const Reports = () => {
     rows.sort((a, b) => b.revenue - a.revenue || b.qty - a.qty);
     return rows;
   }, [orders]);
+
+  const productTotals = useMemo(() => {
+    const totalQty = productSales.reduce((s, r) => s + r.qty, 0);
+    const totalRevenue = productSales.reduce((s, r) => s + r.revenue, 0);
+    return { totalQty, totalRevenue };
+  }, [productSales]);
 
   // ---- Fetchers ----
   const fetchUsers = async () => {
@@ -259,60 +282,83 @@ const Reports = () => {
   };
 
   // ---- UI ----
+  const rangeLabel = `${fmtDate(dateFrom)} → ${fmtDate(dateTo)}`;
+  const heroSubtitle =
+    activeTab === "invoices"
+      ? "Track daily invoice performance and cash desk activity with a classic ledger-inspired view."
+      : "Review product momentum, revenue mix, and order cadence across the catalogue.";
+
+  const heroMetrics = activeTab === "invoices"
+    ? [
+        { label: "Invoices", value: summary.count.toLocaleString() },
+        { label: "Gross Total", value: `$${summary.total.toFixed(2)}` },
+        { label: "Average Ticket", value: `$${summary.avg.toFixed(2)}` },
+      ]
+    : [
+        { label: "Units Sold", value: productTotals.totalQty.toLocaleString() },
+        { label: "Revenue", value: `$${productTotals.totalRevenue.toFixed(2)}` },
+        { label: "Unique SKUs", value: productSales.length.toLocaleString() },
+      ];
+
   return (
     <div className="reports-page">
-      {/* Header */}
-      <div className="page-header" style={{ gap: 12 }}>
-        <h2>Reports</h2>
+      <section className="reports-hero">
+        <div className="reports-hero__copy">
+          <span className="reports-hero__eyebrow">Business Intelligence</span>
+          <h1 className="reports-hero__title">Operational Reports</h1>
+          <p className="reports-hero__subtitle">{heroSubtitle}</p>
+          <p className="reports-hero__range">{rangeLabel}</p>
+        </div>
+        <div className="reports-hero__panel">
+          <QuickRanges onRange={handleQuickRange} dateFrom={dateFrom} dateTo={dateTo} />
+          <div className="reports-hero__meta">
+            {heroMetrics.map((metric) => (
+              <div key={metric.label} className="reports-hero__stat">
+                <span className="reports-hero__stat-label">{metric.label}</span>
+                <span className="reports-hero__stat-value">{metric.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-        {/* Tabs */}
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      <div className="reports-toolbar">
+        <nav className="reports-tabs" aria-label="Report views">
           <button
-            className={activeTab === "invoices" ? "btn-primary" : "btn-secondary"}
+            type="button"
+            className={`reports-tab${activeTab === "invoices" ? " is-active" : ""}`}
             onClick={() => setActiveTab("invoices")}
           >
             Invoices
           </button>
           <button
-            className={activeTab === "products" ? "btn-primary" : "btn-secondary"}
+            type="button"
+            className={`reports-tab${activeTab === "products" ? " is-active" : ""}`}
             onClick={() => setActiveTab("products")}
           >
             Product Sales
           </button>
-        </div>
+        </nav>
 
-        {/* Quick Ranges */}
-        <QuickRanges onRange={handleQuickRange} />
-
-        {/* Actions */}
-        {activeTab === "invoices" && (
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button className="btn-secondary" onClick={fetchOrders} title="Refresh">
-              <RefreshCw size={16} />
-              Refresh
-            </button>
-            <button className="btn-secondary" onClick={() => window.print()}>
-              <Printer size={16} />
-              Print
-            </button>
-            <button className="btn-primary" onClick={exportCSV}>
+        <div className="reports-toolbar__actions">
+          <button type="button" className="btn-secondary" onClick={fetchOrders} title="Refresh">
+            <RefreshCw size={16} />
+            Refresh
+          </button>
+          <button type="button" className="btn-secondary" onClick={() => window.print()}>
+            <Printer size={16} />
+            Print
+          </button>
+          {activeTab === "invoices" && (
+            <button type="button" className="btn-primary" onClick={exportCSV}>
               <Download size={16} />
               Export CSV
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      {/* Filters Row (shared) */}
-      <div
-        className="report-filters"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: 12,
-          alignItems: "end",
-        }}
-      >
+      <div className="report-filters reports-filter-grid">
         <div>
           <label className="filter-label">From</label>
           <input type="date" className="filter-select" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
@@ -361,7 +407,7 @@ const Reports = () => {
       {activeTab === "invoices" ? (
         <>
           {/* KPI Cards */}
-          <div className="reports-grid" style={{ marginTop: 16 }}>
+          <div className="reports-grid reports-kpi-grid">
             <div className="report-card">
               <h3>Total Invoices</h3>
               <div className="report-value">{summary.count}</div>
@@ -377,11 +423,15 @@ const Reports = () => {
           </div>
 
           {/* C3: Expandable Day → Invoices → Items */}
-          <div className="reports-section" style={{ marginTop: 16 }}>
+          <div className="reports-section">
             {loading ? (
-              <div className="report-card"><p>Loading invoices…</p></div>
+              <div className="report-card">
+                <div className="reports-empty">Loading invoices…</div>
+              </div>
             ) : grouped.sortedKeys.length === 0 ? (
-              <div className="report-card"><p>No invoices for this range.</p></div>
+              <div className="report-card">
+                <div className="reports-empty">No invoices for this range.</div>
+              </div>
             ) : (
               grouped.sortedKeys.map((day) => {
                 const list = grouped.byDay[day].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -389,32 +439,20 @@ const Reports = () => {
                 const isOpen = openDays.has(day);
 
                 return (
-                  <div key={day} className="report-card" style={{ padding: 0 }}>
-                    {/* Day header (click to toggle) */}
-                    <button
-                      onClick={() => toggleDay(day)}
-                      className="report-card"
-                      style={{
-                        borderBottomLeftRadius: isOpen ? 0 : undefined,
-                        borderBottomRightRadius: isOpen ? 0 : undefined,
-                        margin: 0,
-                        width: "100%",
-                        textAlign: "left",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                      }}
-                    >
+                  <div key={day} className={`report-card report-card--accordion${isOpen ? " is-open" : ""}`}>
+                    <button type="button" onClick={() => toggleDay(day)} className="accordion-trigger">
                       {isOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-                      <h3 style={{ marginBottom: 0 }}>
-                        {fmtDate(day)} • {list.length} invoices • Total ${dayTotal.toFixed(2)}
-                      </h3>
+                      <span>{fmtDate(day)}</span>
+                      <span className="accordion-trigger__meta">
+                        <span>{list.length} invoices</span>
+                        <span>Total ${dayTotal.toFixed(2)}</span>
+                      </span>
                     </button>
 
                     {/* Invoices Table */}
                     {isOpen && (
-                      <div style={{ overflowX: "auto" }}>
-                        <table className="data-table" style={{ width: "100%" }}>
+                      <div className="reports-table-wrapper">
+                        <table className="data-table reports-table">
                           <thead>
                             <tr>
                               <th></th>
@@ -439,10 +477,10 @@ const Reports = () => {
                                   <tr>
                                     <td style={{ width: 36 }}>
                                       <button
-                                        className="btn-secondary"
+                                        type="button"
+                                        className="reports-table-toggle"
                                         onClick={() => toggleRow(o._id)}
                                         title={rowOpen ? "Hide items" : "Show items"}
-                                        style={{ padding: "2px 6px" }}
                                       >
                                         {rowOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                                       </button>
@@ -467,10 +505,10 @@ const Reports = () => {
                                   {/* Items Row */}
                                   {rowOpen && (
                                     <tr>
-                                      <td colSpan={12} style={{ background: "var(--table-alt,#fafafa)" }}>
-                                        <div style={{ padding: 12 }}>
+                                      <td colSpan={12} className="reports-subtable">
+                                        <div className="reports-table-wrapper">
                                           {o.items?.length ? (
-                                            <table className="data-table" style={{ width: "100%" }}>
+                                            <table className="data-table">
                                               <thead>
                                                 <tr>
                                                   <th>Item</th>
@@ -518,35 +556,38 @@ const Reports = () => {
         </>
       ) : (
         // ===== Product Sales (A1 Simple Table) =====
-        <div className="reports-section" style={{ marginTop: 16 }}>
+        <div className="reports-section">
           {/* KPIs for products */}
-          <div className="reports-grid" style={{ marginBottom: 16 }}>
+          <div className="reports-grid reports-kpi-grid">
             <div className="report-card">
               <h3>Total Items Sold</h3>
               <div className="report-value">
-                {productSales.reduce((s, r) => s + r.qty, 0)}
+                {productTotals.totalQty.toLocaleString()}
               </div>
             </div>
             <div className="report-card">
               <h3>Total Revenue</h3>
               <div className="report-value">
-                ${productSales.reduce((s, r) => s + r.revenue, 0).toFixed(2)}
+                ${productTotals.totalRevenue.toFixed(2)}
               </div>
             </div>
             <div className="report-card">
               <h3>Unique Products</h3>
-              <div className="report-value">{productSales.length}</div>
+              <div className="report-value">{productSales.length.toLocaleString()}</div>
             </div>
           </div>
 
-          <div className="report-card" style={{ padding: 0 }}>
-            <div className="report-card" style={{ margin: 0, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
-              <h3 style={{ marginBottom: 0 }}>
-                Product Sales • {fmtDate(dateFrom)} → {fmtDate(dateTo)}
-              </h3>
+          <div className="report-card report-card--table">
+            <div className="reports-card__header">
+              <h3>Product Sales</h3>
+              <div className="reports-meta-list">
+                <span>{rangeLabel}</span>
+                <span>{productSales.length} items</span>
+              </div>
             </div>
-            <div style={{ overflowX: "auto" }}>
-              <table className="data-table" style={{ width: "100%" }}>
+            <div className="reports-card__body">
+              <div className="reports-table-wrapper">
+                <table className="data-table">
                 <thead>
                   <tr>
                     <th>#</th>
@@ -559,9 +600,17 @@ const Reports = () => {
                 </thead>
                 <tbody>
                   {loading ? (
-                    <tr><td colSpan={6}>Loading…</td></tr>
+                      <tr>
+                        <td colSpan={6}>
+                          <div className="reports-empty">Loading…</div>
+                        </td>
+                      </tr>
                   ) : productSales.length === 0 ? (
-                    <tr><td colSpan={6}>No product sales in this range.</td></tr>
+                      <tr>
+                        <td colSpan={6}>
+                          <div className="reports-empty">No product sales in this range.</div>
+                        </td>
+                      </tr>
                   ) : (
                     productSales.map((r, i) => {
                       const avg = r.qty ? r.revenue / r.qty : 0;
@@ -578,7 +627,8 @@ const Reports = () => {
                     })
                   )}
                 </tbody>
-              </table>
+                </table>
+              </div>
             </div>
           </div>
         </div>
