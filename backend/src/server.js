@@ -13,6 +13,8 @@ import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';  // ADD THIS LINE
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
+import branchRoutes from './routes/branchRoutes.js';
+import expenseRoutes from './routes/expenseRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 
 // Load environment variables
@@ -42,6 +44,8 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);  // ADD THIS LINE
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/branches', branchRoutes);
+app.use('/api/expenses', expenseRoutes);
 app.use('/api/settings', settingsRoutes);
 
 // Health check route

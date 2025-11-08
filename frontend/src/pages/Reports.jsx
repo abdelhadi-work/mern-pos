@@ -100,21 +100,26 @@ const QuickRanges = ({ onRange, dateFrom, dateTo }) => {
   })();
 
   const presets = [
-    { label: "Today", from: t, to: t },
-    { label: "This Week", from: weekStart, to: t },
-    { label: "This Month", from: firstDayMonthISO, to: t },
-    { label: "Last 7 Days", from: addDays(t, -6), to: t },
-    { label: "Last 30 Days", from: addDays(t, -29), to: t },
+    { label: "Today", from: t, to: t, id: "today" },
+    { label: "This Week", from: weekStart, to: t, id: "week" },
+    { label: "This Month", from: firstDayMonthISO, to: t, id: "month" },
+    { label: "Last 7 Days", from: addDays(t, -6), to: t, id: "7days" },
+    { label: "Last 30 Days", from: addDays(t, -29), to: t, id: "30days" },
   ];
 
   return (
     <div className="quick-range-group">
       {presets.map((preset) => {
-        const isActive = preset.from === dateFrom && preset.to === dateTo;
+        // Exact match: both from and to must match exactly
+        // Use strict comparison to ensure only ONE button is active
+        const fromMatch = preset.from === dateFrom;
+        const toMatch = preset.to === dateTo;
+        const isActive = fromMatch && toMatch;
+        
         return (
           <button
             type="button"
-            key={preset.label}
+            key={preset.id}
             className={`quick-range${isActive ? " is-active" : ""}`}
             onClick={() => onRange(preset.from, preset.to)}
           >

@@ -51,6 +51,11 @@ const orderSchema = new mongoose.Schema(
       type: String,
       unique: true
     },
+    branch: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Branch',
+      required: false, // Optional for backward compatibility
+    },
     items: [orderItemSchema],
     subtotal: {
       type: Number,

@@ -222,7 +222,7 @@ function App() {
         <Route
           path="/finance"
           element={
-            <ProtectedRoute allowedRoles={["finance_admin"]}>
+            <ProtectedRoute allowedRoles={["finance_admin", "main_admin", "accounting_admin"]}>
               <DashboardLayout>
                 <FinanceDashboard />
               </DashboardLayout>

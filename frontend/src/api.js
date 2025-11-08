@@ -77,6 +77,28 @@ export const analyticsAPI = {
   getProfitSummary: (params) => api.get('/analytics/profit/summary', { params }),
   getCategoryProfit: (params) => api.get('/analytics/profit/categories', { params }),
   getProductProfit: (params) => api.get('/analytics/profit/products', { params }),
+  getInventoryMetrics: (params) => api.get('/analytics/inventory', { params }),
+  getCashflow: (params) => api.get('/analytics/cashflow', { params }),
+  getComparative: (params) => api.get('/analytics/comparative', { params }),
+  getAlerts: (params) => api.get('/analytics/alerts', { params }),
+};
+
+// Branch endpoints
+export const branchAPI = {
+  getAll: () => api.get('/branches'),
+  getById: (id) => api.get(`/branches/${id}`),
+  create: (data) => api.post('/branches', data),
+  update: (id, data) => api.put(`/branches/${id}`, data),
+  delete: (id) => api.delete(`/branches/${id}`),
+};
+
+// Expense endpoints
+export const expenseAPI = {
+  getAll: (params) => api.get('/expenses', { params }),
+  getById: (id) => api.get(`/expenses/${id}`),
+  create: (data) => api.post('/expenses', data),
+  update: (id, data) => api.put(`/expenses/${id}`, data),
+  delete: (id) => api.delete(`/expenses/${id}`),
 };
 
 // Settings endpoints

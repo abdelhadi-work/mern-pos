@@ -16,6 +16,11 @@ const productSchema = new mongoose.Schema(
       unique: true,
       trim: true,
     },
+    branch: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Branch',
+      required: false, // Optional for backward compatibility
+    },
     barcode: {
       type: String,
       trim: true,
