@@ -139,31 +139,6 @@ const Login = () => {
           </button>
         </form>
 
-        {/* Demo Credentials */}
-        <div className="demo-credentials">
-          <div className="demo-title">
-            <span className="demo-icon">🔑</span>
-            Demo Credentials
-          </div>
-          <div className="demo-grid">
-            <div className="demo-item">
-              <span className="demo-role">Admin</span>
-              <span className="demo-creds">admin / admin123</span>
-            </div>
-            <div className="demo-item">
-              <span className="demo-role">Finance</span>
-              <span className="demo-creds">finance / finance123</span>
-            </div>
-            <div className="demo-item">
-              <span className="demo-role">Cashier</span>
-              <span className="demo-creds">cashier / cashier123</span>
-            </div>
-            <div className="demo-item">
-              <span className="demo-role">Delivery</span>
-              <span className="demo-creds">delivery / delivery123</span>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Footer */}
