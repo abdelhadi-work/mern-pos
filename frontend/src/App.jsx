@@ -13,17 +13,15 @@ import Products from "./pages/Products";
 import Categories from "./pages/Categories";
 import Orders from "./pages/Orders";
 import ManageUsers from "./pages/ManageUsers";
+import Settings from "./pages/Settings";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
-import Shop from "./pages/Shop";
-import Delivery from "./pages/Delivery"
-
-
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, isAuthenticated, loading } = useAuth();
 
+  // Show loading spinner
   if (loading) {
     return (
       <div
@@ -59,13 +57,12 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   }
 
   if (allowedRoles && !allowedRoles.includes(user?.role)) {
+    // Redirect to appropriate default page based on role
     const defaultPages = {
       cashier: "/pos",
       main_admin: "/dashboard",
       finance_admin: "/dashboard",
       accounting_admin: "/dashboard",
-      delivery: "/delivery",
-
     };
     return <Navigate to={defaultPages[user?.role] || "/dashboard"} replace />;
   }
@@ -94,23 +91,32 @@ const DashboardLayout = ({ children }) => {
 };
 
 // Placeholder Page
-const PlaceholderPage = ({ page }) => (
-  <div className="placeholder-container">
-    <div className="placeholder-icon">⚙️</div>
-    <h2 className="placeholder-title">{page.replace("_", " ")}</h2>
-    <p className="placeholder-text">
-      This section is under development. Feature will be available soon.
-    </p>
-  </div>
-);
+const PlaceholderPage = ({ page }) => {
+  return (
+    <div className="placeholder-container">
+      <div className="placeholder-icon">⚙️</div>
+      <h2 className="placeholder-title">{page.replace("_", " ")}</h2>
+      <p className="placeholder-text">
+        This section is under development. Feature will be available soon.
+      </p>
+    </div>
+  );
+};
 
 // Root Redirect Component
 const RootRedirect = () => {
   const { user, isAuthenticated, loading } = useAuth();
+
   if (loading) return null;
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (user?.role === "cashier") return <Navigate to="/pos" replace />;
-  if (user?.role === "delivery") return <Navigate to="/delivery" replace />;
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Redirect based on role
+  if (user?.role === "cashier") {
+    return <Navigate to="/pos" replace />;
+  }
 
   return <Navigate to="/dashboard" replace />;
 };
@@ -121,12 +127,11 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Routes */}
+        {/* Public Route */}
         <Route
           path="/login"
           element={isAuthenticated ? <RootRedirect /> : <Login />}
         />
-        <Route path="/shop" element={<Shop />} />
 
         {/* Root */}
         <Route path="/" element={<RootRedirect />} />
@@ -156,6 +161,7 @@ function App() {
           }
         />
 
+        {/* FIXED: Categories - Only main_admin can access */}
         <Route
           path="/categories"
           element={
@@ -167,23 +173,10 @@ function App() {
           }
         />
 
-
-        <Route
-  path="/delivery"
-  element={
-    <ProtectedRoute allowedRoles={["delivery"]}>
-      <DashboardLayout>
-        <Delivery />
-      </DashboardLayout>
-    </ProtectedRoute>
-  }
-/>
-
-
         <Route
           path="/pos"
           element={
-            <ProtectedRoute allowedRoles={["cashier"]}>
+            <ProtectedRoute>
               <DashboardLayout>
                 <POS />
               </DashboardLayout>
@@ -253,7 +246,7 @@ function App() {
           element={
             <ProtectedRoute>
               <DashboardLayout>
-                <PlaceholderPage page="settings" />
+                <Settings />
               </DashboardLayout>
             </ProtectedRoute>
           }

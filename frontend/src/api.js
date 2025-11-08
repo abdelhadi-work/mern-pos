@@ -1,59 +1,19 @@
 // ============================================
-// FILE: client/src/api.js (WITH DEBUGGING)
+// FILE: client/src/api.js (COMPLETE)
 // ============================================
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5001/api';
-
 const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: 'http://localhost:5001/api',
 });
 
-// Request Interceptor - Add token and log requests
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    console.log(`📤 API Request: ${config.method.toUpperCase()} ${config.url}`);
-    return config;
-  },
-  (error) => {
-    console.error('❌ Request Error:', error);
-    return Promise.reject(error);
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
-);
-
-// Response Interceptor - Log responses and handle errors
-api.interceptors.response.use(
-  (response) => {
-    console.log(`✅ API Response: ${response.config.method.toUpperCase()} ${response.config.url}`, response.data);
-    return response;
-  },
-  (error) => {
-    console.error('❌ API Error:', {
-      url: error.config?.url,
-      method: error.config?.method,
-      status: error.response?.status,
-      message: error.response?.data?.message || error.message,
-      data: error.response?.data
-    });
-
-    // Handle 401 - Unauthorized
-    if (error.response?.status === 401) {
-      console.log('🔒 Unauthorized - Redirecting to login');
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
-
-    return Promise.reject(error);
-  }
-);
+  return config;
+});
 
 // Auth endpoints
 export const authAPI = {
@@ -91,28 +51,21 @@ export const productAPI = {
   getLowStock: () => api.get('/products/lowstock'),
 };
 
-// Order endpoints
+// Order endpoints - ENHANCED VERSION
 export const orderAPI = {
-  getAll: (params) => api.get('/orders', { params }),
+  getAll: (params) => api.get('/orders', { params }),  // Enhanced with params
   create: (data) => api.post('/orders', data),
   getById: (id) => api.get(`/orders/${id}`),
-  getTodaySales: () => api.get('/orders/today'),
-  cancelOrder: (id, data) => api.put(`/orders/${id}/cancel`, data),
-  refundOrder: (id, data) => api.post(`/orders/${id}/refund`, data),
-  getSalesReport: (params) => api.get('/orders/report', { params }),
+  getTodaySales: () => api.get('/orders/today'),  // NEW ENDPOINT
+  cancelOrder: (id, data) => api.put(`/orders/${id}/cancel`, data),  // NEW ENDPOINT
+  refundOrder: (id, data) => api.post(`/orders/${id}/refund`, data),  // NEW ENDPOINT
+  getSalesReport: (params) => api.get('/orders/report', { params }),  // NEW ENDPOINT
 };
 
-// Public endpoints (no auth required)
-export const publicAPI = {
-  getProducts: (params) => axios.get(`${API_BASE_URL}/public/products`, { params }),
-  getCategories: () => axios.get(`${API_BASE_URL}/public/categories`),
-  createOrder: (data) => axios.post(`${API_BASE_URL}/public/orders`, data),
-};
-
-// Customer endpoints
-export const customerAPI = {
-  create: (data) => api.post('/customers', data),
-  placeOrder: (data) => api.post('/customers/order', data),
+// Report endpoints
+export const reportAPI = {
+  getSales: (params) => api.get('/reports/sales', { params }),
+  getFinancial: (params) => api.get('/reports/financial', { params }),
 };
 
 // Analytics endpoints (Finance Dashboard)
@@ -124,6 +77,39 @@ export const analyticsAPI = {
   getProfitSummary: (params) => api.get('/analytics/profit/summary', { params }),
   getCategoryProfit: (params) => api.get('/analytics/profit/categories', { params }),
   getProductProfit: (params) => api.get('/analytics/profit/products', { params }),
+};
+
+// Settings endpoints
+export const settingsAPI = {
+  // Profile
+  getProfile: () => api.get('/settings/profile'),
+  updateProfile: (data) => api.put('/settings/profile', data),
+  
+  // Security
+  getSecurity: () => api.get('/settings/security'),
+  updateSecurity: (data) => api.put('/settings/security', data),
+  revokeSession: (sessionId) => api.delete(`/settings/security/sessions/${sessionId}`),
+  signOutAllSessions: () => api.delete('/settings/security/sessions/all'),
+  
+  // Notifications
+  getNotifications: () => api.get('/settings/notifications'),
+  updateNotifications: (data) => api.put('/settings/notifications', data),
+  
+  // Storefront
+  getStorefront: () => api.get('/settings/storefront'),
+  updateStorefront: (data) => api.put('/settings/storefront', data),
+  
+  // Billing
+  getBilling: () => api.get('/settings/billing'),
+  updateBilling: (data) => api.put('/settings/billing', data),
+  
+  // Integrations
+  getIntegrations: () => api.get('/settings/integrations'),
+  updateIntegrations: (data) => api.put('/settings/integrations', data),
+  
+  // Audit
+  getAudit: () => api.get('/settings/audit'),
+  addAuditEntry: (data) => api.post('/settings/audit', data),
 };
 
 export default api;

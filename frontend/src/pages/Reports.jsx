@@ -130,8 +130,8 @@ const Reports = () => {
   // Tabs: "invoices" | "products"
   const [activeTab, setActiveTab] = useState("invoices");
 
-  // Filters
-  const [dateFrom, setDateFrom] = useState(todayISO());
+  // Filters - Default to last 7 days instead of just today
+  const [dateFrom, setDateFrom] = useState(addDays(todayISO(), -6));
   const [dateTo, setDateTo] = useState(todayISO());
   const [cashiers, setCashiers] = useState([]);
   const [cashierId, setCashierId] = useState("");
@@ -265,6 +265,27 @@ const Reports = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handlePrint = () => {
+    // Expand all accordions before printing
+    const allDays = new Set(grouped.sortedKeys);
+    const allOrders = new Set(orders.map(o => o._id));
+    setOpenDays(allDays);
+    setOpenRows(allOrders);
+    
+    // Add print class to body
+    document.body.classList.add('printing');
+    
+    // Wait for DOM to update, then print
+    setTimeout(() => {
+      window.print();
+      
+      // Remove print class after printing
+      setTimeout(() => {
+        document.body.classList.remove('printing');
+      }, 100);
+    }, 150);
+  };
+
   // ---- Expand helpers (C3) ----
   const toggleDay = (dayKey) => {
     setOpenDays((prev) => {
@@ -345,7 +366,7 @@ const Reports = () => {
             <RefreshCw size={16} />
             Refresh
           </button>
-          <button type="button" className="btn-secondary" onClick={() => window.print()}>
+          <button type="button" className="btn-secondary" onClick={handlePrint} title="Print report with all details">
             <Printer size={16} />
             Print
           </button>

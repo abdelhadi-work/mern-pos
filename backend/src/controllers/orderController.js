@@ -154,6 +154,8 @@ export const getAllOrders = async (req, res) => {
       cashier,
       startDate,
       endDate,
+      start,  // Support both 'start' and 'startDate'
+      end,    // Support both 'end' and 'endDate'
       page = 1,
       limit = 20
     } = req.query;
@@ -165,14 +167,17 @@ export const getAllOrders = async (req, res) => {
     if (paymentMethod) query.paymentMethod = paymentMethod;
     if (cashier) query.cashier = cashier;
     
-    // Date range filter
-    if (startDate || endDate) {
+    // Date range filter - support both parameter names
+    const fromDate = start || startDate;
+    const toDate = end || endDate;
+    
+    if (fromDate || toDate) {
       query.createdAt = {};
-      if (startDate) query.createdAt.$gte = new Date(startDate);
-      if (endDate) {
-        const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);
-        query.createdAt.$lte = end;
+      if (fromDate) query.createdAt.$gte = new Date(fromDate);
+      if (toDate) {
+        const endTime = new Date(toDate);
+        endTime.setHours(23, 59, 59, 999);
+        query.createdAt.$lte = endTime;
       }
     }
 

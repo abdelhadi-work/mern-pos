@@ -569,3 +569,356 @@
   }
 }
 
+/* ============================================
+   PRINT STYLES - Professional Print Layout
+   ============================================ */
+@media print {
+  /* Reset page margins and setup */
+  @page {
+    size: A4;
+    margin: 1.5cm 1cm;
+  }
+
+  /* Hide non-printable elements */
+  .reports-toolbar,
+  .quick-range-group,
+  .reports-tabs,
+  .btn-secondary,
+  .btn-primary,
+  .reports-table-toggle,
+  button:not(.accordion-trigger) {
+    display: none !important;
+  }
+  
+  .accordion-trigger svg {
+    display: none !important;
+  }
+
+  /* Page setup */
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 10pt;
+    line-height: 1.4;
+  }
+
+  /* Hide navigation elements */
+  .sidebar,
+  .navbar,
+  nav,
+  header {
+    display: none !important;
+  }
+
+  .reports-page {
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+
+  /* Hero section - compact for print */
+  .reports-hero {
+    background: white !important;
+    border: 2px solid #000 !important;
+    border-radius: 0 !important;
+    padding: 16px !important;
+    box-shadow: none !important;
+    page-break-after: avoid;
+    margin-bottom: 20px;
+  }
+
+  .reports-hero::after {
+    display: none;
+  }
+
+  .reports-hero__eyebrow {
+    font-size: 9pt;
+    color: #000 !important;
+    margin-bottom: 6px;
+  }
+
+  .reports-hero__title {
+    font-size: 18pt;
+    color: #000 !important;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+
+  .reports-hero__subtitle {
+    font-size: 9pt;
+    color: #333 !important;
+    margin-bottom: 12px;
+  }
+
+  .reports-hero__range {
+    font-size: 9pt;
+    color: #000 !important;
+    font-weight: 600;
+    border-top: 1px solid #ccc;
+    padding-top: 8px;
+    margin-top: 8px;
+  }
+
+  .reports-hero__panel {
+    align-items: flex-start;
+  }
+
+  .reports-hero__meta {
+    background: #f5f5f5 !important;
+    border: 1px solid #ccc !important;
+    border-radius: 0 !important;
+    padding: 12px !important;
+    backdrop-filter: none !important;
+  }
+
+  .reports-hero__stat-label {
+    font-size: 8pt;
+    color: #555 !important;
+  }
+
+  .reports-hero__stat-value {
+    font-size: 14pt;
+    color: #000 !important;
+    font-weight: 700;
+  }
+
+  /* Filters section - simplified */
+  .report-filters {
+    background: white !important;
+    border: 1px solid #ccc !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin-bottom: 16px;
+    page-break-inside: avoid;
+  }
+
+  .reports-filter-grid {
+    padding: 12px !important;
+    gap: 12px !important;
+  }
+
+  .filter-label {
+    font-size: 8pt !important;
+    color: #000 !important;
+  }
+
+  .filter-select,
+  .reports-page input[type="date"] {
+    border: 1px solid #999 !important;
+    background: white !important;
+    font-size: 9pt !important;
+    padding: 4px 8px !important;
+    border-radius: 0 !important;
+  }
+
+  /* Report cards */
+  .report-card {
+    background: white !important;
+    border: 1px solid #ccc !important;
+    border-radius: 0 !important;
+    padding: 12px !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+    margin-bottom: 12px;
+  }
+
+  .report-card:hover {
+    transform: none !important;
+  }
+
+  .report-card h3 {
+    font-size: 12pt;
+    color: #000 !important;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 4px;
+  }
+
+  /* Accordion - always expanded for print */
+  .report-card--accordion {
+    padding: 0 !important;
+  }
+
+  .report-card--accordion .accordion-trigger {
+    padding: 12px !important;
+    border-bottom: 2px solid #000 !important;
+    background: #f5f5f5 !important;
+    font-size: 11pt !important;
+    font-weight: 700 !important;
+    color: #000 !important;
+  }
+
+  .accordion-trigger__meta {
+    font-size: 9pt !important;
+    color: #333 !important;
+  }
+
+  /* Tables - optimized for print */
+  .reports-table-wrapper {
+    overflow: visible !important;
+  }
+
+  .reports-page .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8pt;
+    page-break-inside: auto;
+  }
+
+  .reports-page .data-table thead {
+    background: #e5e5e5 !important;
+    display: table-header-group; /* Repeat header on each page */
+  }
+
+  .reports-page .data-table th {
+    padding: 6px 8px !important;
+    font-size: 8pt !important;
+    font-weight: 700 !important;
+    color: #000 !important;
+    border: 1px solid #999 !important;
+    background: #e5e5e5 !important;
+  }
+
+  .reports-page .data-table td {
+    padding: 6px 8px !important;
+    font-size: 8pt !important;
+    color: #000 !important;
+    border: 1px solid #ccc !important;
+    page-break-inside: avoid;
+  }
+
+  .reports-page .data-table tbody tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  .reports-page .data-table tbody tr:hover {
+    background: transparent !important;
+  }
+
+  /* Subtables */
+  .reports-subtable {
+    background: #fafafa !important;
+    border-left: 3px solid #999 !important;
+  }
+
+  .reports-subtable .data-table th {
+    background: #f0f0f0 !important;
+  }
+
+  /* Empty states */
+  .reports-empty {
+    padding: 24px !important;
+    font-size: 10pt !important;
+    color: #666 !important;
+    border: 1px dashed #ccc !important;
+  }
+
+  /* Badges and meta */
+  .reports-badge {
+    background: #e5e5e5 !important;
+    color: #000 !important;
+    font-size: 8pt !important;
+    padding: 2px 8px !important;
+    border: 1px solid #999 !important;
+  }
+
+  .reports-meta-list {
+    font-size: 8pt !important;
+    color: #333 !important;
+  }
+
+  /* Section spacing */
+  .reports-section {
+    margin-top: 16px !important;
+    gap: 12px !important;
+  }
+
+  /* Force show content that might be hidden */
+  .report-card--accordion .accordion-trigger + * {
+    display: block !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  
+  /* Ensure all content is visible */
+  .reports-section,
+  .report-card,
+  .reports-table-wrapper,
+  .data-table {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  /* Page breaks */
+  .reports-hero,
+  .report-filters {
+    page-break-after: avoid;
+  }
+
+  .reports-section {
+    page-break-before: avoid;
+  }
+
+  /* Print footer with page numbers */
+  @page {
+    @bottom-right {
+      content: "Page " counter(page) " of " counter(pages);
+      font-size: 8pt;
+      color: #666;
+    }
+  }
+
+  /* Hide decorative elements */
+  .reports-hero::after,
+  .reports-hero::before {
+    display: none !important;
+  }
+
+  /* Ensure black text for all important content */
+  h1, h2, h3, h4, h5, h6,
+  .reports-hero__title,
+  .accordion-trigger,
+  strong {
+    color: #000 !important;
+    font-weight: 700 !important;
+  }
+
+  /* Links should be visible */
+  a {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+
+  /* Remove shadows and transitions */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Force display all main content */
+  .reports-page,
+  .reports-page * {
+    visibility: visible !important;
+  }
+
+  .reports-hero,
+  .reports-hero *,
+  .report-filters,
+  .report-filters *,
+  .reports-section,
+  .reports-section *,
+  .report-card,
+  .report-card * {
+    display: revert !important;
+  }
+
+  /* Override any display:none except for buttons */
+  .reports-page > *:not(button):not(.reports-toolbar):not(.quick-range-group):not(.reports-tabs) {
+    display: block !important;
+  }
+}
+
