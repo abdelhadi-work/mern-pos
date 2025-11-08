@@ -11,6 +11,7 @@ import authRoutes from './routes/authRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';  // ADD THIS LINE
+import deliveryRoutes from './routes/deliveryRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import analyticsRoutes from './routes/analyticsRoutes.js';
 import branchRoutes from './routes/branchRoutes.js';
@@ -43,6 +44,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);  // ADD THIS LINE
+app.use('/api/delivery', deliveryRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/branches', branchRoutes);
 app.use('/api/expenses', expenseRoutes);

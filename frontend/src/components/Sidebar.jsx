@@ -16,7 +16,8 @@ import {
   ChevronRight,
   TrendingUp,
   PieChart,
-  Wallet
+  Wallet,
+  Truck
 } from 'lucide-react';
 
 const menuConfig = {
@@ -64,6 +65,10 @@ const menuConfig = {
   cashier: [
     { name: 'POS', icon: ShoppingCart, path: '/pos' },
     { name: 'Products', icon: Package, path: '/products' },
+    { name: 'Settings', icon: Settings, path: '/settings' },
+  ],
+  delivery: [
+    { name: 'Delivery Dashboard', icon: Truck, path: '/delivery' },
     { name: 'Settings', icon: Settings, path: '/settings' },
   ],
 };

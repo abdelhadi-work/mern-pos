@@ -2,7 +2,7 @@
 // FILE: client/src/App.jsx (FIXED ROUTES)
 // ============================================
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -16,9 +16,11 @@ import ManageUsers from "./pages/ManageUsers";
 import Settings from "./pages/Settings";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
+import Delivery from "./pages/Delivery";
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
+  const location = useLocation();
   const { user, isAuthenticated, loading } = useAuth();
 
   // Show loading spinner
@@ -63,8 +65,13 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
       main_admin: "/dashboard",
       finance_admin: "/dashboard",
       accounting_admin: "/dashboard",
+      delivery: "/delivery",
     };
-    return <Navigate to={defaultPages[user?.role] || "/dashboard"} replace />;
+    const fallbackRoute = defaultPages[user?.role] || "/login";
+    if (location.pathname !== fallbackRoute) {
+      return <Navigate to={fallbackRoute} replace />;
+    }
+    return <Navigate to="/login" replace />;
   }
 
   return children;
@@ -116,6 +123,10 @@ const RootRedirect = () => {
   // Redirect based on role
   if (user?.role === "cashier") {
     return <Navigate to="/pos" replace />;
+  }
+
+  if (user?.role === "delivery") {
+    return <Navigate to="/delivery" replace />;
   }
 
   return <Navigate to="/dashboard" replace />;
@@ -201,6 +212,16 @@ function App() {
             <ProtectedRoute allowedRoles={["main_admin"]}>
               <DashboardLayout>
                 <Orders />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/delivery"
+          element={
+            <ProtectedRoute allowedRoles={["delivery"]}>
+              <DashboardLayout>
+                <Delivery />
               </DashboardLayout>
             </ProtectedRoute>
           }
