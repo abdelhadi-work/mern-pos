@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Eye, EyeOff, User, Lock, Zap, ShoppingCart, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import '../styles/global.css';
 
@@ -10,6 +10,15 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+
+  const matrixColumns = useMemo(() => {
+    const characters = '01ΞΨЖÆØ$#@∆╳╱╲';
+    const rows = 60;
+    const columns = 18;
+    return Array.from({ length: columns }, () =>
+      Array.from({ length: rows }, () => characters[Math.floor(Math.random() * characters.length)]).join('\n')
+    );
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,60 +36,139 @@ const Login = () => {
 
   return (
     <div className="login-container">
+      {/* Matrix Rain Background */}
+      <div className="login-bg-decoration">
+        <div className="matrix-grid">
+          {matrixColumns.map((column, index) => (
+            <div
+              key={index}
+              className="matrix-column"
+              data-symbols={column}
+              style={{ '--delay': `${index * 0.35}s`, '--duration': `${12 + (index % 5) * 1.8}s` }}
+            ></div>
+          ))}
+        </div>
+        <div className="matrix-overlay"></div>
+        <div className="decoration-circle circle-1"></div>
+        <div className="decoration-circle circle-2"></div>
+      </div>
+
       <div className="login-card">
-        <div className="login-header">
-          <div className="login-logo">Electronics POS</div>
-          <div className="login-subtitle">Sign in to your account</div>
+        {/* Logo Section */}
+        <div className="login-logo-container">
+          <div className="login-logo-icon">
+            <ShoppingCart size={40} />
+          </div>
+          <div className="login-logo-pulse"></div>
         </div>
 
-        {error && <div className="error-message">{error}</div>}
+        {/* Header */}
+        <div className="login-header">
+          <h1 className="login-logo">Electronics POS</h1>
+          <p className="login-subtitle">Welcome back! Please sign in to continue</p>
+        </div>
 
-        <form onSubmit={handleSubmit}>
+        {/* Error Message */}
+        {error && (
+          <div className="error-message">
+            <span className="error-icon">⚠</span>
+            {error}
+          </div>
+        )}
+
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
-            <label className="form-label">Username</label>
-            <input
-              type="text"
-              className="form-input"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
-              required
-            />
+            <label className="form-label">
+              <User size={16} />
+              <span>Username</span>
+            </label>
+            <div className="input-wrapper">
+              <input
+                type="text"
+                className="form-input login-input"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter your username"
+                required
+              />
+              <div className="input-border"></div>
+            </div>
           </div>
 
           <div className="form-group">
-            <label className="form-label">Password</label>
-            <div className="password-wrapper">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                className="form-input"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                required
-              />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
+            <label className="form-label">
+              <Lock size={16} />
+              <span>Password</span>
+            </label>
+            <div className="input-wrapper">
+              <div className="password-wrapper">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  className="form-input login-input"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              <div className="input-border"></div>
             </div>
           </div>
 
           <button type="submit" className="login-btn" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? (
+              <>
+                <Loader2 size={20} className="spinner" />
+                <span>Signing in...</span>
+              </>
+            ) : (
+              <>
+                <Zap size={20} />
+                <span>Sign In</span>
+              </>
+            )}
           </button>
         </form>
 
+        {/* Demo Credentials */}
         <div className="demo-credentials">
-          <div className="demo-title">Demo Credentials:</div>
-          <div className="demo-item">Admin: admin / admin123</div>
-          <div className="demo-item">Finance: finance / finance123</div>
-          <div className="demo-item">Cashier: cashier / cashier123</div>
-          <div className="demo-item">Delivery: delivery / delivery123</div>
+          <div className="demo-title">
+            <span className="demo-icon">🔑</span>
+            Demo Credentials
+          </div>
+          <div className="demo-grid">
+            <div className="demo-item">
+              <span className="demo-role">Admin</span>
+              <span className="demo-creds">admin / admin123</span>
+            </div>
+            <div className="demo-item">
+              <span className="demo-role">Finance</span>
+              <span className="demo-creds">finance / finance123</span>
+            </div>
+            <div className="demo-item">
+              <span className="demo-role">Cashier</span>
+              <span className="demo-creds">cashier / cashier123</span>
+            </div>
+            <div className="demo-item">
+              <span className="demo-role">Delivery</span>
+              <span className="demo-creds">delivery / delivery123</span>
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* Footer */}
+      <div className="login-footer">
+        <p>© 2025 Electronics POS. All rights reserved.</p>
       </div>
     </div>
   );
