@@ -115,6 +115,15 @@ export const customerAPI = {
   placeOrder: (data) => api.post('/customers/order', data),
 };
 
+// Delivery endpoints
+export const deliveryAPI = {
+  getMyOrders: () => api.get('/delivery/my-orders'),
+  getAvailable: () => api.get('/delivery/available'),
+  getTaken: () => api.get('/delivery/taken'),
+  updateStatus: (id, status) => api.put(`/delivery/${id}/status`, { status }),
+};
+
+
 // Analytics endpoints (Finance Dashboard)
 export const analyticsAPI = {
   getSummary: (params) => api.get('/analytics/summary', { params }),

@@ -17,7 +17,7 @@ import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import Shop from "./pages/Shop";
 import Delivery from "./pages/Delivery"
-
+import MyOrders from "./pages/MyOrders";
 
 
 // Protected Route Component
@@ -179,6 +179,16 @@ function App() {
   }
 />
 
+<Route
+  path="/delivery/my-orders"
+  element={
+    <ProtectedRoute allowedRoles={["delivery"]}>
+      <DashboardLayout>
+        <MyOrders />
+      </DashboardLayout>
+    </ProtectedRoute>
+  }
+/>
 
         <Route
           path="/pos"

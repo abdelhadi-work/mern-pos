@@ -133,7 +133,8 @@ const Shop = () => {
         total: item.price * item.quantity
       })),
       totalAmount: getTotalPrice(),
-      status: 'pending'
+      status: 'pending',
+      orderSource: "online"
     };
 
     try {

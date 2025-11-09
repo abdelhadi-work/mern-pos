@@ -13,6 +13,7 @@ import {
   Settings,
   Layers
 } from 'lucide-react';
+import Delivery from '../pages/Delivery';
 
 const menuConfig = {
   main_admin: [
@@ -40,6 +41,13 @@ const menuConfig = {
     { name: 'POS', icon: ShoppingCart, path: '/pos' },
     { name: 'Products', icon: Package, path: '/products' },
     { name: 'Settings', icon: Settings, path: '/settings' },
+  ],
+
+  delivery: [
+  { name: 'All Orders', icon: Package, path: '/delivery' },
+  { name: 'My Orders', icon: Package, path: '/delivery/my-orders' },
+  { name: 'Settings', icon: Settings, path: '/settings' },
+
   ],
 };
 
