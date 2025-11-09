@@ -633,6 +633,11 @@ const FinanceDashboard = () => {
     return () => clearInterval(id);
   }, [autoRefresh, refetchSummary, refetchTimeseries, refetchMix, refetchOrders, refetchExpenses]);
 
+  // Debug: Log summary data
+  useEffect(() => {
+    console.log('Summary data:', summary);
+  }, [summary]);
+
   return (
     <div className="reports-page">
       {/* Hero Section */}
@@ -693,7 +698,7 @@ const FinanceDashboard = () => {
             </div>
             <div className="reports-hero__stat">
               <span className="reports-hero__stat-label">Avg Order</span>
-              <div className="reports-hero__stat-value">{formatCurrency(summary?.avgOrderValue)}</div>
+              <div className="reports-hero__stat-value">{formatCurrency(summary?.avgTicket)}</div>
             </div>
           </div>
         </div>
@@ -724,8 +729,8 @@ const FinanceDashboard = () => {
         {[
           { label: 'Revenue', value: formatCurrency(summary?.revenue) },
           { label: 'Orders', value: summary?.ordersCount || 0 },
-          { label: 'Avg Order', value: formatCurrency(summary?.avgOrderValue) },
-          { label: 'Items Sold', value: summary?.itemsSold || 0 },
+          { label: 'Avg Order', value: formatCurrency(summary?.avgTicket) },
+          { label: 'Items/Order', value: (summary?.itemsPerOrder || 0).toFixed(2) },
         ].map((k) => (
           <div key={k.label} className="report-card">
             <h3>{k.label}</h3>
@@ -1285,5 +1290,3 @@ const TopBar = React.memo(({ params, autoRefresh, setAutoRefresh }) => {
 });
 
 export default FinanceDashboard;
-
-
