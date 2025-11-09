@@ -39,8 +39,11 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(userData));
       
-      setUser(userData);
-      setIsAuthenticated(true);
+      // Delay authentication to show celebration animation
+      setTimeout(() => {
+        setUser(userData);
+        setIsAuthenticated(true);
+      }, 1800); // 1.8 seconds for full animation
       
       return { success: true };
     } catch (error) {

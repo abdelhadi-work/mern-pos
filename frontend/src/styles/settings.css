@@ -71,6 +71,41 @@
   font-weight: 600;
 }
 
+.settings-page .btn-primary,
+.settings-page .btn-secondary {
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.settings-page .btn-primary {
+  background: #0f172a;
+  color: #ffffff;
+  border: 1px solid transparent;
+  box-shadow: 0 12px 28px -22px rgba(15, 23, 42, 0.75);
+}
+
+.settings-page .btn-primary:hover:not(:disabled) {
+  background: #111827;
+}
+
+.settings-page .btn-secondary {
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  box-shadow: 0 10px 24px -24px rgba(15, 23, 42, 0.6);
+}
+
+.settings-page .btn-secondary:hover:not(:disabled) {
+  background: rgba(15, 23, 42, 0.12);
+  border-color: rgba(15, 23, 42, 0.18);
+}
+
 .settings-hero__actions {
   display: flex;
   flex-wrap: wrap;

@@ -79,25 +79,39 @@ const fmtTime = (d) =>
 const startOfDay = (date) => new Date(new Date(date).setHours(0, 0, 0, 0)).toISOString();
 const endOfDay = (date) => new Date(new Date(date).setHours(23, 59, 59, 999)).toISOString();
 
-const todayISO = () => new Date().toISOString().slice(0, 10);
+const normalizeISODate = (value) => {
+  const d = new Date(value);
+  d.setHours(12, 0, 0, 0); // use midday to avoid DST shifts when slicing date
+  return d.toISOString().slice(0, 10);
+};
+
+const todayISO = () => normalizeISODate(new Date());
 const addDays = (iso, days) => {
   const d = new Date(iso);
+  d.setHours(12, 0, 0, 0);
   d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+};
+
+const startOfWeekISO = (iso, weekStartsOn = 1) => {
+  const d = new Date(iso);
+  d.setHours(12, 0, 0, 0);
+  const day = d.getDay();
+  const diff = (day - weekStartsOn + 7) % 7;
+  d.setDate(d.getDate() - diff);
   return d.toISOString().slice(0, 10);
 };
 
 const QuickRanges = ({ onRange, dateFrom, dateTo }) => {
   const t = todayISO();
-  const firstDayMonth = new Date();
-  firstDayMonth.setDate(1);
-  const firstDayMonthISO = firstDayMonth.toISOString().slice(0, 10);
-
-  const weekStart = (() => {
+  const firstDayMonthISO = (() => {
     const d = new Date();
-    const day = d.getDay(); // Sun=0
-    d.setDate(d.getDate() - day);
+    d.setHours(12, 0, 0, 0);
+    d.setDate(1);
     return d.toISOString().slice(0, 10);
   })();
+
+  const weekStart = startOfWeekISO(t, 1); // Monday as the first day of the week
 
   const presets = [
     { label: "Today", from: t, to: t, id: "today" },
@@ -220,6 +234,8 @@ const Reports = () => {
       const params = {
         start: startOfDay(dateFrom),
         end: endOfDay(dateTo),
+        startDate: dateFrom,
+        endDate: dateTo,
         cashier: cashierId || undefined,
         paymentMethod: paymentMethod || undefined,
         status: status || undefined,
@@ -227,7 +243,8 @@ const Reports = () => {
       };
       const res = await orderAPI.getAll(params);
       setOrders(res?.data?.orders || []);
-    } catch {
+    } catch (error) {
+      console.error("Failed to fetch orders", error);
       setOrders([]);
     } finally {
       setLoading(false);
@@ -236,6 +253,10 @@ const Reports = () => {
 
   useEffect(() => { fetchUsers(); }, []);
   useEffect(() => { fetchOrders(); }, [dateFrom, dateTo, cashierId, paymentMethod, status]);
+  useEffect(() => {
+    setOpenDays(new Set());
+    setOpenRows(new Set());
+  }, [dateFrom, dateTo]);
 
   // ---- Handlers ----
   const handleQuickRange = (from, to) => {

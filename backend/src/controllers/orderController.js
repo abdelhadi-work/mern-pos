@@ -4,6 +4,7 @@
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 import User from '../models/User.js';
+import Customer from '../models/Customer.js';
 
 // CREATE NEW ORDER
 export const createOrder = async (req, res) => {
@@ -187,7 +188,7 @@ export const getAllOrders = async (req, res) => {
     const [orders, total] = await Promise.all([
       Order.find(query)
         .populate('cashier', 'fullName username')
-        .populate('customer', 'name phone')
+        .populate({ path: 'customer', select: 'name phone', model: Customer })
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(parseInt(limit)),

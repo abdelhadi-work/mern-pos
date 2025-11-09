@@ -8,45 +8,82 @@ import '../styles/reports.css';
 
 const formatCurrency = (n) => new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(n || 0);
 
-const presetRange = (days) => {
-  const end = new Date();
-  const start = new Date();
-  start.setDate(end.getDate() - (days - 1));
-  return { start: start.toISOString(), end: end.toISOString() };
+const startOfDayISO = (date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d.toISOString();
 };
 
-const onQuickRange = (type, setFilters) => {
+const endOfDayISO = (date) => {
+  const d = new Date(date);
+  d.setHours(23, 59, 59, 999);
+  return d.toISOString();
+};
+
+const presetRange = (days) => {
+  const end = endOfDayISO(new Date());
+  const startDate = new Date(end);
+  startDate.setDate(startDate.getDate() - (days - 1));
+  const start = startOfDayISO(startDate);
+  return { start, end };
+};
+
+const buildNamedRange = (type) => {
   const now = new Date();
-  let start, end;
-  
-  if (type === 'today') {
-    start = new Date(now);
-    start.setHours(0, 0, 0, 0);
-    end = new Date(now);
-    end.setHours(23, 59, 59, 999);
-  } else if (type === 'yesterday') {
-    start = new Date(now);
-    start.setDate(start.getDate() - 1);
-    start.setHours(0, 0, 0, 0);
-    end = new Date(start);
-    end.setHours(23, 59, 59, 999);
-  } else if (type === 'mtd') {
-    start = new Date(now.getFullYear(), now.getMonth(), 1);
-    end = new Date(now);
-    end.setHours(23, 59, 59, 999);
-  } else if (type === 'ytd') {
-    start = new Date(now.getFullYear(), 0, 1);
-    end = new Date(now);
-    end.setHours(23, 59, 59, 999);
-  } else if (type === 'last90') {
-    start = new Date(now);
-    start.setDate(start.getDate() - 89);
-    start.setHours(0, 0, 0, 0);
-    end = new Date(now);
-    end.setHours(23, 59, 59, 999);
+  switch (type) {
+    case 'today': {
+      return { start: startOfDayISO(now), end: endOfDayISO(now) };
+    }
+    case 'yesterday': {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      return { start: startOfDayISO(d), end: endOfDayISO(d) };
+    }
+    case 'mtd': {
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      return { start: startOfDayISO(start), end: endOfDayISO(now) };
+    }
+    case 'ytd': {
+      const start = new Date(now.getFullYear(), 0, 1);
+      return { start: startOfDayISO(start), end: endOfDayISO(now) };
+    }
+    case 'last90': {
+      const start = new Date();
+      start.setDate(start.getDate() - 89);
+      return { start: startOfDayISO(start), end: endOfDayISO(now) };
+    }
+    case 'last7':
+      return presetRange(7);
+    case 'last30':
+      return presetRange(30);
+    default:
+      return { start: startOfDayISO(now), end: endOfDayISO(now) };
   }
-  
-  setFilters((f) => ({ ...f, start: start.toISOString(), end: end.toISOString() }));
+};
+
+const applyNamedRange = (type, setFilters) => {
+  const range = buildNamedRange(type);
+  setFilters((f) => ({ ...f, ...range }));
+};
+
+const isRangeEqual = (aStart, aEnd, bStart, bEnd) => {
+  if (!aStart || !aEnd || !bStart || !bEnd) return false;
+  return new Date(aStart).getTime() === new Date(bStart).getTime() &&
+    new Date(aEnd).getTime() === new Date(bEnd).getTime();
+};
+
+const getActiveRangeKey = (start, end) => {
+  const candidates = [
+    { key: 'last7', range: buildNamedRange('last7') },
+    { key: 'last30', range: buildNamedRange('last30') },
+    { key: 'today', range: buildNamedRange('today') },
+    { key: 'mtd', range: buildNamedRange('mtd') },
+    { key: 'ytd', range: buildNamedRange('ytd') },
+    { key: 'yesterday', range: buildNamedRange('yesterday') },
+    { key: 'last90', range: buildNamedRange('last90') },
+  ];
+  const match = candidates.find(({ range }) => isRangeEqual(start, end, range.start, range.end));
+  return match?.key || null;
 };
 
 const Button = ({ children, onClick, variant = 'primary', disabled, className = '' }) => {
@@ -82,40 +119,6 @@ const FiltersBar = ({ filters, setFilters, categories, cashiers, branches }) => 
   const [presetName, setPresetName] = useState('');
 
   const onPreset = (d) => setFilters((f) => ({ ...f, ...presetRange(d) }));
-  
-  const onQuickRange = (type) => {
-    const now = new Date();
-    let start, end;
-    
-    if (type === 'today') {
-      start = new Date(now);
-      start.setHours(0, 0, 0, 0);
-      end = new Date(now);
-      end.setHours(23, 59, 59, 999);
-    } else if (type === 'yesterday') {
-      start = new Date(now);
-      start.setDate(start.getDate() - 1);
-      start.setHours(0, 0, 0, 0);
-      end = new Date(start);
-      end.setHours(23, 59, 59, 999);
-    } else if (type === 'mtd') {
-      start = new Date(now.getFullYear(), now.getMonth(), 1);
-      end = new Date(now);
-      end.setHours(23, 59, 59, 999);
-    } else if (type === 'ytd') {
-      start = new Date(now.getFullYear(), 0, 1);
-      end = new Date(now);
-      end.setHours(23, 59, 59, 999);
-    } else if (type === 'last90') {
-      start = new Date(now);
-      start.setDate(start.getDate() - 89);
-      start.setHours(0, 0, 0, 0);
-      end = new Date(now);
-      end.setHours(23, 59, 59, 999);
-    }
-    
-    setFilters((f) => ({ ...f, start: start.toISOString(), end: end.toISOString() }));
-  };
 
   const savePreset = () => {
     if (!presetName.trim()) return;
@@ -538,6 +541,7 @@ const FinanceDashboard = () => {
   });
   const [filters, setFilters] = useState(initial);
   const [autoRefresh, setAutoRefresh] = useState(false);
+  const activeQuickRangeKey = useMemo(() => getActiveRangeKey(filters.start, filters.end), [filters.start, filters.end]);
 
   // Sync filters -> URL
   useEffect(() => {
@@ -647,11 +651,36 @@ const FinanceDashboard = () => {
         </div>
         <div className="reports-hero__panel">
           <div className="quick-range-group">
-            <button className="quick-range" onClick={() => setFilters((f) => ({ ...f, ...presetRange(7) }))}>Last 7d</button>
-            <button className="quick-range" onClick={() => setFilters((f) => ({ ...f, ...presetRange(30) }))}>Last 30d</button>
-            <button className="quick-range" onClick={() => onQuickRange('today', setFilters)}>Today</button>
-            <button className="quick-range" onClick={() => onQuickRange('mtd', setFilters)}>MTD</button>
-            <button className="quick-range" onClick={() => onQuickRange('ytd', setFilters)}>YTD</button>
+            <button
+              className={`quick-range${activeQuickRangeKey === 'last7' ? ' is-active' : ''}`}
+              onClick={() => applyNamedRange('last7', setFilters)}
+            >
+              Last 7d
+            </button>
+            <button
+              className={`quick-range${activeQuickRangeKey === 'last30' ? ' is-active' : ''}`}
+              onClick={() => applyNamedRange('last30', setFilters)}
+            >
+              Last 30d
+            </button>
+            <button
+              className={`quick-range${activeQuickRangeKey === 'today' ? ' is-active' : ''}`}
+              onClick={() => applyNamedRange('today', setFilters)}
+            >
+              Today
+            </button>
+            <button
+              className={`quick-range${activeQuickRangeKey === 'mtd' ? ' is-active' : ''}`}
+              onClick={() => applyNamedRange('mtd', setFilters)}
+            >
+              MTD
+            </button>
+            <button
+              className={`quick-range${activeQuickRangeKey === 'ytd' ? ' is-active' : ''}`}
+              onClick={() => applyNamedRange('ytd', setFilters)}
+            >
+              YTD
+            </button>
           </div>
           <div className="reports-hero__meta">
             <div className="reports-hero__stat">
