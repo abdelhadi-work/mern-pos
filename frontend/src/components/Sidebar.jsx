@@ -39,16 +39,15 @@ const menuConfig = {
   ],
   finance_admin: [
     { name: 'Dashboard', icon: BarChart3, path: '/dashboard' },
-    { 
-      name: 'Finance', 
-      icon: DollarSign, 
-      submenu: [
+    { name: 'Finance', icon: DollarSign, submenu: [
         { name: 'Overview', icon: TrendingUp, path: '/finance' },
         { name: 'Reports', icon: PieChart, path: '/reports' },
       ]
     },
     { name: 'Settings', icon: Settings, path: '/settings' },
   ],
+
+
   accounting_admin: [
     { name: 'Dashboard', icon: BarChart3, path: '/dashboard' },
     { 
@@ -69,6 +68,7 @@ const menuConfig = {
   ],
   delivery: [
     { name: 'Delivery Dashboard', icon: Truck, path: '/delivery' },
+      { name: 'My Orders', icon: Package, path: '/delivery/my-orders' },
     { name: 'Settings', icon: Settings, path: '/settings' },
   ],
 };

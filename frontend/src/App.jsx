@@ -17,6 +17,8 @@ import Settings from "./pages/Settings";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import Delivery from "./pages/Delivery";
+import MyOrders from "./pages/MyOrders";
+import Shop from "./pages/Shop";
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -143,6 +145,8 @@ function App() {
           path="/login"
           element={isAuthenticated ? <RootRedirect /> : <Login />}
         />
+        
+        <Route path="/shop" element={<Shop />} />
 
         {/* Root */}
         <Route path="/" element={<RootRedirect />} />
@@ -226,6 +230,17 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+  path="/delivery/my-orders"
+  element={
+    <ProtectedRoute allowedRoles={["delivery"]}>
+      <DashboardLayout>
+        <MyOrders />
+      </DashboardLayout>
+    </ProtectedRoute>
+  }
+/>
 
         <Route
           path="/reports"

@@ -17,6 +17,9 @@ import analyticsRoutes from './routes/analyticsRoutes.js';
 import branchRoutes from './routes/branchRoutes.js';
 import expenseRoutes from './routes/expenseRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
+import http from "http";                           
+import { Server as SocketIOServer } from "socket.io";
+import publicRoutes from './routes/publicRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -49,6 +52,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/branches', branchRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/public', publicRoutes);
 
 // Health check route
 app.get('/', (req, res) => {
@@ -59,9 +63,33 @@ app.get('/', (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
+
+
+const server = http.createServer(app);
+const io = new SocketIOServer(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  },
+});
+
+app.set("io", io);
+
+// socket events
+io.on("connection", (socket) => {
+  console.log("🔌 Delivery Socket Connected:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("❌ Delivery Socket Disconnected:", socket.id);
+  });
+});
+
 // Start the server
 const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Uploads directory: ${path.join(__dirname, '../uploads')}`);
+server.listen(PORT, () => {
+  console.log("=================================");
+  console.log(`🚀 Server with Socket.io running on port ${PORT}`);
+  console.log(`🌍 API URL: http://localhost:${PORT}`);
+  console.log(`📂 Uploads: ${path.join(__dirname, "../uploads")}`);
+  console.log("=================================");
 });

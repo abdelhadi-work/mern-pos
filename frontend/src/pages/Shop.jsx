@@ -136,6 +136,41 @@ const Shop = () => {
       status: 'pending'
     };
 
+
+
+
+//     const orderData = {
+//   guestCustomer: {
+//     name: customerInfo.name,
+//     phone: customerInfo.phone,
+//     email: customerInfo.email,
+//     address: customerInfo.address,
+//   },
+//   items: cart.map(item => ({
+//     product: item._id,
+//     name: item.name,
+//     quantity: item.quantity,
+//     price: item.price,
+//     total: item.price * item.quantity
+//   })),
+//   subtotal: getTotalPrice(),
+//   tax: { rate: 0, amount: 0 },
+//   discount: { type: "fixed", value: 0, amount: 0 },
+//   total: getTotalPrice(),
+//   status: "pending",
+//   paymentMethod: "pending",
+//   paymentDetails: {
+//     isPaid: false
+//   },
+//   orderSource: "online",
+//   delivery: {
+//     assignedTo: null,
+//     status: "pending"
+//   },
+//   notes: "Order placed via online shop"
+// };
+
+
     try {
       const response = await fetch(`${API_BASE_URL}/public/orders`, {
         method: 'POST',

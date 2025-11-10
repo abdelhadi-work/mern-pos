@@ -51,6 +51,15 @@ export const productAPI = {
   getLowStock: () => api.get('/products/lowstock'),
 };
 
+
+// Delivery endpoints
+export const deliveryAPI = {
+  getMyOrders: () => api.get('/delivery/my-orders'),
+  getAvailable: () => api.get('/delivery/available'),
+  getTaken: () => api.get('/delivery/taken'),
+  updateStatus: (id, status) => api.put(`/delivery/${id}/status`, { status }),
+};
+
 // Order endpoints - ENHANCED VERSION
 export const orderAPI = {
   getAll: (params) => api.get('/orders', { params }),  // Enhanced with params
