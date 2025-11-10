@@ -14,7 +14,7 @@ const Delivery = () => {
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState("");
 
-  // helper
+  // helper method
   const isMine = (order) =>
     order?.delivery?.assignedTo &&
     (order.delivery.assignedTo._id === user?._id ||
